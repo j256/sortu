@@ -292,6 +292,10 @@ int	main(int argc, char **argv)
 	if (! (loose_fields_b && *tok == '\0')) {
 	  field_c--;
 	}
+	
+	/* reset the line bounds */
+	for (line_bounds_p = line; *line_bounds_p != '\0'; line_bounds_p++) {
+	}
       }
       
       /* oh well, no specified field */
