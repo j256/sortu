@@ -387,10 +387,10 @@ int	main(int argc, char **argv)
     subtotal += *count_p;
     
     if (! no_counts_b) {
-      (void)printf("%10lu", *count_p);
+      (void)printf("%10lu ", *count_p);
       
       if (cumulative_b) {
-	(void)printf(" %10lu", subtotal);
+	(void)printf("%10lu ", subtotal);
       }
     }
     
@@ -401,7 +401,7 @@ int	main(int argc, char **argv)
       else {
 	perc = *count_p * 100 / total;
       }
-      (void)printf(" %4ld%%", perc);
+      (void)printf("%4ld%% ", perc);
       
       if (cumulative_b) {
 	if (total > 1000000) {
@@ -410,48 +410,48 @@ int	main(int argc, char **argv)
 	else {
 	  perc = subtotal * 100 / total;
 	}
-	(void)printf(" %4ld%%", perc);
+	(void)printf("%4ld%% ", perc);
       }
     }
     
     if (numbers_b) {
-      (void)printf(" %10ld\n", *(long *)key_p);
+      (void)printf("%10ld\n", *(long *)key_p);
     }
     else if (float_numbers_b) {
-      (void)printf(" %10.2f\n", *(double *)key_p);
+      (void)printf("%10.2f\n", *(double *)key_p);
     }
     else {
-      (void)printf(" %.*s\n", key_size, (char *)key_p);
+      (void)printf("%.*s\n", key_size, (char *)key_p);
     }
   }
   
   if (verbose_b) {
-    (void)printf("----------");
+    (void)printf("---------- ");
     if (cumulative_b) {
-      (void)printf(" ----------");
+      (void)printf("---------- ");
     }
     if (show_percentage_b) {
-      (void)printf(" -----");
+      (void)printf("----- ");
       if (cumulative_b) {
-	(void)printf(" -----");
+	(void)printf("----- ");
       }
     }
-    (void)printf(" ----------\n");
-    (void)printf("%10ld", total);
+    (void)printf("----------\n");
+    (void)printf("%10ld ", total);
     if (cumulative_b) {
-      (void)printf(" %10ld", subtotal);
+      (void)printf("%10ld ", subtotal);
     }
     if (show_percentage_b) {
-      (void)printf(" %5.5s", "100%");
+      (void)printf("%5.5s ", "100%");
       if (cumulative_b) {
-	(void)printf(" %5.5s", "100%");
+	(void)printf("%5.5s ", "100%");
       }
     }
     if (numbers_b || float_numbers_b) {
-      (void)printf(" %10.10s\n", "Total");
+      (void)printf("%10.10s\n", "Total");
     }
     else {
-      (void)printf(" %-10.10s\n", "Total");
+      (void)printf("%-10.10s\n", "Total");
     }
   }
   
