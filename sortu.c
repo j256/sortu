@@ -235,9 +235,14 @@ int	main(int argc, char **argv)
   /* order the table */
   entries = table_order(tab, count_compare, &entry_n, &ret);
   if (entries == NULL) {
-    (void)fprintf(stderr, "%s: could not order the table: %s\n",
-		  argv_program, table_strerror(ret));
-    exit(1);
+    if (ret == TABLE_ERROR_EMPTY) {
+      entry_n = 0;
+    }
+    else {
+      (void)fprintf(stderr, "%s: could not order the table: %s\n",
+		    argv_program, table_strerror(ret));
+      exit(1);
+    }
   }
   
   for (entries_p = entries; entries_p < entries + entry_n; entries_p++) {
@@ -267,7 +272,9 @@ int	main(int argc, char **argv)
     }
   }
   
-  (void)table_order_free(tab, entries, entry_n);
+  if (entries != NULL) {
+    (void)table_order_free(tab, entries, entry_n);
+  }
   (void)table_free(tab);
   
   argv_cleanup(args);
