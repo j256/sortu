@@ -294,7 +294,7 @@ int	main(int argc, char **argv)
 	}
 	
 	/* reset the line bounds */
-	for (line_bounds_p = line; *line_bounds_p != '\0'; line_bounds_p++) {
+	for (line_bounds_p = tok; *line_bounds_p != '\0'; line_bounds_p++) {
 	}
       }
       
