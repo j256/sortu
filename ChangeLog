@@ -1,3 +1,7 @@
+2002-02-04  Gray Watson  <gray@outside.256.com>
+
+	* Added percentage and total and fixed some output.
+
 Mon Oct  2 19:21:21 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Swapped the default order of the count.  Use -r to get the old

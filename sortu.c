@@ -31,6 +31,7 @@ static	int		min_matches = 0;	/* minimum number of matches */
 static	int		max_matches = 0;	/* max number of matches */
 static	int		numbers_b = 0;		/* fields are numbers */
 static	int		float_numbers_b = 0;	/* fields are floats */
+static	int		show_percentage_b = 0;	/* show percentage vals */
 static	int		reverse_sort_b = 0;	/* reverse the sort order */
 static	int		verbose_b = 0;		/* verbose flag */
 static	argv_array_t	files;			/* work files */
@@ -60,6 +61,8 @@ static	argv_t	args[] = {
     NULL,		"treat field as signed long number" },
   { 'N',	"float-numbers", ARGV_BOOL_INT,		&float_numbers_b,
     NULL,		"treat field as floating point" },
+  { 'p',	"percentage-show", ARGV_BOOL_INT,	&show_percentage_b,
+    NULL,		"show percentage along with count" },
   { 'r',	"reverse-sort",	ARGV_BOOL_INT,		&reverse_sort_b,
     NULL,		"reverse the sort" },
   { 'v',	"verbose",	ARGV_BOOL_INT,		&verbose_b,
@@ -164,7 +167,7 @@ int	main(int argc, char **argv)
   FILE		*infile;
   char		*filename, line[LINE_SIZE], *tok, *line_p;
   int		file_c, ret, field_c, key_size, entry_n;
-  unsigned long	count, *count_p;
+  unsigned long	count, *count_p, total, perc;
   long		value;
   double	double_value;
   void		*key_p;
@@ -298,14 +301,21 @@ int	main(int argc, char **argv)
   }
   
   if (verbose_b && (! no_counts_b)) {
+    (void)printf("%10.10s", "Count:");
+    if (show_percentage_b) {
+      (void)printf(" %5.5s", "%:");
+    }
     if (numbers_b || float_numbers_b) {
-      (void)printf("%10.10s %10.10s\n", "Count:", "Data:");
-      (void)printf("---------- ----------\n");
+      (void)printf(" %10.10s\n", "Data:");
     }
     else {
-      (void)printf("%10.10s Data:\n", "Count:");
-      (void)printf("---------- ----------\n");
+      (void)printf(" %-10.10s\n", "Data:");
     }
+    (void)printf("----------");
+    if (show_percentage_b) {
+      (void)printf(" -----");
+    }
+    (void)printf(" ----------\n");
   }
   
   /* order the table */
@@ -319,6 +329,27 @@ int	main(int argc, char **argv)
 		    argv_program, table_strerror(ret));
       exit(1);
     }
+  }
+  
+  /* get the total */
+  total = 0;
+  for (entries_p = entries; entries_p < entries + entry_n; entries_p++) {
+    /* get each entry to print */
+    ret = table_entry(tab, *entries_p, (void **)&key_p, &key_size,
+		      (void **)&count_p, NULL);
+    if (ret != TABLE_ERROR_NONE) {
+      (void)fprintf(stderr, "%s: could not get table entry: %s\n",
+		    argv_program, table_strerror(ret));
+      exit(1);
+    }
+    
+    /* limit the matches if necessary */
+    if (*count_p < min_matches
+	|| (max_matches > 0 && *count_p > max_matches)) {
+      continue;
+    }
+    
+    total += *count_p;
   }
   
   for (entries_p = entries; entries_p < entries + entry_n; entries_p++) {
@@ -338,17 +369,45 @@ int	main(int argc, char **argv)
     }
     
     if (! no_counts_b) {
-      (void)printf("%10lu ", *count_p);
+      (void)printf("%10lu", *count_p);
+    }
+    
+    if (show_percentage_b) {
+      if (total > 1000000) {
+	perc = *count_p / (total / 100);
+      }
+      else {
+	perc = *count_p * 100 / total;
+      }
+      (void)printf(" %4ld%%", perc);
     }
     
     if (numbers_b) {
-      (void)printf("%10ld\n", *(long *)key_p);
+      (void)printf(" %10ld\n", *(long *)key_p);
     }
     else if (float_numbers_b) {
-      (void)printf("%10.2f\n", *(double *)key_p);
+      (void)printf(" %10.2f\n", *(double *)key_p);
     }
     else {
-      (void)printf("%.*s\n", key_size, (char *)key_p);
+      (void)printf(" %.*s\n", key_size, (char *)key_p);
+    }
+  }
+  
+  if (verbose_b) {
+    (void)printf("----------");
+    if (show_percentage_b) {
+      (void)printf(" -----");
+    }
+    (void)printf(" ----------\n");
+    (void)printf("%10.10s", "Total:");
+    if (show_percentage_b) {
+      (void)printf(" %5.5s", "100%");
+    }
+    if (numbers_b || float_numbers_b) {
+      (void)printf(" %10ld\n", total);
+    }
+    else {
+      (void)printf(" %ld\n", total);
     }
   }
   
