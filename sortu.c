@@ -110,10 +110,10 @@ static	int	count_compare(const void *key1, const int key1_size,
     long1_p = data1;
     long2_p = data2;
     if (reverse_sort_b) {
-      result = *long1_p - *long2_p;
+      result = *long2_p - *long1_p;
     }
     else {
-      result = *long2_p - *long1_p;
+      result = *long1_p - *long2_p;
     }
     /* if the count is == then sort by key */
     if (result != 0) {
