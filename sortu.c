@@ -30,6 +30,7 @@ static	int		loose_fields_b = 0;	/* loose field match */
 static	int		min_matches = 0;	/* minimum number of matches */
 static	int		max_matches = 0;	/* max number of matches */
 static	int		numbers_b = 0;		/* fields are numbers */
+static	int		float_numbers_b = 0;	/* fields are floats */
 static	int		reverse_sort_b = 0;	/* reverse the sort order */
 static	int		verbose_b = 0;		/* verbose flag */
 static	argv_array_t	files;			/* work files */
@@ -57,6 +58,8 @@ static	argv_t	args[] = {
   { ARGV_OR },
   { 'n',	"numbers",	ARGV_BOOL_INT,		&numbers_b,
     NULL,		"treat field as signed long number" },
+  { 'N',	"float-numbers", ARGV_BOOL_INT,		&float_numbers_b,
+    NULL,		"treat field as floating point" },
   { 'r',	"reverse-sort",	ARGV_BOOL_INT,		&reverse_sort_b,
     NULL,		"reverse the sort" },
   { 'v',	"verbose",	ARGV_BOOL_INT,		&verbose_b,
@@ -79,36 +82,36 @@ static	argv_t	args[] = {
  *
  * ARGUMENTS:
  *
- * key1 - Pointer to the first key entry.
+ * key1 -> Pointer to the first key entry.
  *
- * key1_size - Pointer to the size of the first key entry.
+ * key1_size -> Pointer to the size of the first key entry.
  *
- * data1 - Pointer to the first data entry.
+ * data1 -> Pointer to the first data entry.
  *
- * data1_size - Pointer to the size of the first data entry.
+ * data1_size -> Pointer to the size of the first data entry.
  *
- * key2 - Pointer to the second key entry.
+ * key2 -> Pointer to the second key entry.
  *
- * key2_size - Pointer to the size of the second key entry.
+ * key2_size -> Pointer to the size of the second key entry.
  *
- * data2 - Pointer to the second data entry.
+ * data2 -> Pointer to the second data entry.
  *
- * data2_size - Pointer to the size of the second data entry.
+ * data2_size -> Pointer to the size of the second data entry.
  */
-static	int	count_compare(const void *key1, const int key1_size,
-			      const void *data1, const int data1_size,
-			      const void *key2, const int key2_size,
-			      const void *data2, const int data2_size)
+static	int	count_compare(const void *key1_p, const int key1_size,
+			      const void *data1_p, const int data1_size,
+			      const void *key2_p, const int key2_size,
+			      const void *data2_p, const int data2_size)
 {
-  const long		*long1_p, *long2_p;
-  const unsigned long	*ulong1_p, *ulong2_p;
-  const char		*str1_p, *str2_p;
-  int			result;
+  const double	*float1_p, *float2_p;
+  const long	*long1_p, *long2_p;
+  const char	*str1_p, *str2_p;
+  int		result;
   
   /* if we aren't sorting by key then sort the count */
   if (! key_sort_b) {
-    long1_p = data1;
-    long2_p = data2;
+    long1_p = data1_p;
+    long2_p = data2_p;
     if (reverse_sort_b) {
       result = *long2_p - *long1_p;
     }
@@ -123,19 +126,30 @@ static	int	count_compare(const void *key1, const int key1_size,
   
   if (numbers_b) {
     /* reverse numeric sort */
-    ulong1_p = key1;
-    ulong2_p = key2;
+    long1_p = key1_p;
+    long2_p = key2_p;
     if (reverse_sort_b) {
-      return *ulong2_p - *ulong1_p;
+      return *long2_p - *long1_p;
     }
     else {
-      return *ulong1_p - *ulong2_p;
+      return *long1_p - *long2_p;
+    }
+  }
+  else if (float_numbers_b) {
+    /* reverse numeric sort */
+    float1_p = key1_p;
+    float2_p = key2_p;
+    if (reverse_sort_b) {
+      return *float2_p - *float1_p;
+    }
+    else {
+      return *float1_p - *float2_p;
     }
   }
   else {
     /* forward string sort */
-    str1_p = key1;
-    str2_p = key2;
+    str1_p = key1_p;
+    str2_p = key2_p;
     if (reverse_sort_b) {
       return strcmp(str2_p, str1_p);
     }
@@ -152,6 +166,7 @@ int	main(int argc, char **argv)
   int		file_c, ret, field_c, key_size, entry_n;
   unsigned long	count, *count_p;
   long		value;
+  double	float_value;
   void		*key_p;
   table_t	*tab;
   table_entry_t	**entries, **entries_p;
@@ -240,6 +255,11 @@ int	main(int argc, char **argv)
 	value = atol(tok);
 	key_p = &value;
 	key_size = sizeof(value);
+      }
+      else if (float_numbers_b) {
+	float_value = atof(tok);
+	key_p = &float_value;
+	key_size = sizeof(float_value);
       }
       else {
 	if (case_insens_b) {
