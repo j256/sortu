@@ -1,3 +1,7 @@
+2004-07-16  Gray Watson  <gray@outside.256.com>
+
+	* Added -F --format format string to the output.
+
 2004-02-05  Gray Watson  <gray@outside.256.com>
 
 	* Added -o --order-sort to keep the keys in order that they were
