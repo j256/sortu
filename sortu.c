@@ -21,6 +21,7 @@
 
 /* argument variables */
 static	int		ignore_blanks_b = 0;	/* ignore blank lines */
+static	int		cumulative_b = 0;	/* show cumulative numbers */
 static	int		no_counts_b = 0;	/* don't output str counts */
 static	char		*delim_str = DEFAULT_DELIM; /* field delim char */
 static	int		field = -1;		/* field to use */
@@ -40,6 +41,8 @@ static	argv_array_t	files;			/* work files */
 static	argv_t	args[] = {
   { 'b',	"blank-ignore",	ARGV_BOOL_INT,		&ignore_blanks_b,
     NULL,		"ignore blank lines" },
+  { 'c',	"cumulative-numbers", ARGV_BOOL_INT,	&cumulative_b,
+    NULL,		"show percentage along with count" },
   { 'C',	"no-counts",	ARGV_BOOL_INT,		&no_counts_b,
     NULL,		"don't output string counts" },
   { 'd',	"delimiter",	ARGV_CHAR_P,		&delim_str,
@@ -167,7 +170,7 @@ int	main(int argc, char **argv)
   FILE		*infile;
   char		*filename, line[LINE_SIZE], *tok, *line_p;
   int		file_c, ret, field_c, key_size, entry_n;
-  unsigned long	count, *count_p, total, perc;
+  unsigned long	count, *count_p, total, subtotal, val, perc;
   long		value;
   double	double_value;
   void		*key_p;
@@ -302,8 +305,14 @@ int	main(int argc, char **argv)
   
   if (verbose_b && (! no_counts_b)) {
     (void)printf("%10.10s", "Count:");
+    if (cumulative_b) {
+      (void)printf(" %10.10s", "Cumulate:");
+    }
     if (show_percentage_b) {
       (void)printf(" %5.5s", "%:");
+      if (cumulative_b) {
+	(void)printf(" %5.5s", "C %:");
+      }
     }
     if (numbers_b || float_numbers_b) {
       (void)printf(" %10.10s\n", "Data:");
@@ -312,8 +321,14 @@ int	main(int argc, char **argv)
       (void)printf(" %-10.10s\n", "Data:");
     }
     (void)printf("----------");
+    if (cumulative_b) {
+      (void)printf(" ----------");
+    }
     if (show_percentage_b) {
       (void)printf(" -----");
+      if (cumulative_b) {
+	(void)printf(" -----");
+      }
     }
     (void)printf(" ----------\n");
   }
@@ -352,6 +367,7 @@ int	main(int argc, char **argv)
     total += *count_p;
   }
   
+  subtotal = 0;
   for (entries_p = entries; entries_p < entries + entry_n; entries_p++) {
     /* get each entry to print */
     ret = table_entry(tab, *entries_p, (void **)&key_p, &key_size,
@@ -368,8 +384,14 @@ int	main(int argc, char **argv)
       continue;
     }
     
+    subtotal += *count_p;
+    
     if (! no_counts_b) {
       (void)printf("%10lu", *count_p);
+      
+      if (cumulative_b) {
+	(void)printf(" %10lu", subtotal);
+      }
     }
     
     if (show_percentage_b) {
@@ -380,6 +402,16 @@ int	main(int argc, char **argv)
 	perc = *count_p * 100 / total;
       }
       (void)printf(" %4ld%%", perc);
+      
+      if (cumulative_b) {
+	if (total > 1000000) {
+	  perc = subtotal / (total / 100);
+	}
+	else {
+	  perc = subtotal * 100 / total;
+	}
+	(void)printf(" %4ld%%", perc);
+      }
     }
     
     if (numbers_b) {
@@ -395,19 +427,31 @@ int	main(int argc, char **argv)
   
   if (verbose_b) {
     (void)printf("----------");
+    if (cumulative_b) {
+      (void)printf(" ----------");
+    }
     if (show_percentage_b) {
       (void)printf(" -----");
+      if (cumulative_b) {
+	(void)printf(" -----");
+      }
     }
     (void)printf(" ----------\n");
-    (void)printf("%10.10s", "Total:");
+    (void)printf("%10ld", total);
+    if (cumulative_b) {
+      (void)printf(" %10ld", subtotal);
+    }
     if (show_percentage_b) {
       (void)printf(" %5.5s", "100%");
+      if (cumulative_b) {
+	(void)printf(" %5.5s", "100%");
+      }
     }
     if (numbers_b || float_numbers_b) {
-      (void)printf(" %10ld\n", total);
+      (void)printf(" %10.10s\n", "Total");
     }
     else {
-      (void)printf(" %ld\n", total);
+      (void)printf(" %-10.10s\n", "Total");
     }
   }
   
