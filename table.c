@@ -16,7 +16,7 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be reached via http://www.letters.com/~gray/
+ * The author may be reached via http://256.com/gray/
  *
  * $Id$
  */
@@ -42,19 +42,6 @@
 
 #include <io.h>
 #include <malloc.h>
-#define NO_MMAP
-#define open _open
-
-#endif
-
-#ifndef NO_MMAP
-
-#include <sys/mman.h>
-#include <sys/stat.h>
-
-#ifndef MAP_FAILED
-#define MAP_FAILED	(caddr_t)0L
-#endif
 
 #endif
 
@@ -1127,7 +1114,6 @@ table_t		*table_alloc(const unsigned int bucket_n, int *error_p)
   table_p->ta_linear.tl_magic = 0;
   table_p->ta_linear.tl_bucket_c = 0;
   table_p->ta_linear.tl_entry_c = 0;
-  table_p->ta_mmap = NULL;
   table_p->ta_file_size = 0;
   table_p->ta_mem_pool = NULL;
   table_p->ta_alloc_func = NULL;
@@ -1222,7 +1208,6 @@ table_t		*table_alloc_in_pool(const unsigned int bucket_n,
   table_p->ta_linear.tl_magic = 0;
   table_p->ta_linear.tl_bucket_c = 0;
   table_p->ta_linear.tl_entry_c = 0;
-  table_p->ta_mmap = NULL;
   table_p->ta_file_size = 0;
   table_p->ta_mem_pool = mem_pool;
   table_p->ta_alloc_func = alloc_func;
@@ -1368,13 +1353,6 @@ int	table_clear(table_t *table_p)
     return TABLE_ERROR_PNT;
   }
   
-#ifndef NO_MMAP
-  /* no mmap support so immediate error */
-  if (table_p->ta_mmap != NULL) {
-    return TABLE_ERROR_MMAP_OP;
-  }
-#endif
-  
   /* free the table allocation and table structure */
   bounds_p = table_p->ta_buckets + table_p->ta_bucket_n;
   for (bucket_p = table_p->ta_buckets; bucket_p < bounds_p; bucket_p++) {
@@ -1432,13 +1410,6 @@ int	table_free(table_t *table_p)
   if (table_p->ta_magic != TABLE_MAGIC) {
     return TABLE_ERROR_PNT;
   }
-  
-#ifndef NO_MMAP
-  /* no mmap support so immediate error */
-  if (table_p->ta_mmap != NULL) {
-    return TABLE_ERROR_MMAP_OP;
-  }
-#endif
   
   ret = table_clear(table_p);
   
@@ -1569,13 +1540,6 @@ int	table_insert_kd(table_t *table_p,
       || (data_buf != NULL && data_size == 0)) {
     return TABLE_ERROR_SIZE;
   }
-  
-#ifndef NO_MMAP
-  /* no mmap support so immediate error */
-  if (table_p->ta_mmap != NULL) {
-    return TABLE_ERROR_MMAP_OP;
-  }
-#endif
   
   /* determine sizes of key and data */
   if (key_size < 0) {
@@ -2009,13 +1973,6 @@ int	table_delete(table_t *table_p,
     return TABLE_ERROR_ARG_NULL;
   }
   
-#ifndef NO_MMAP
-  /* no mmap support so immediate error */
-  if (table_p->ta_mmap != NULL) {
-    return TABLE_ERROR_MMAP_OP;
-  }
-#endif
-  
   /* get the key size */
   if (key_size < 0) {
     ksize = strlen((char *)key_buf) + sizeof(char);
@@ -2171,13 +2128,6 @@ int	table_delete_first(table_t *table_p,
   if (table_p->ta_magic != TABLE_MAGIC) {
     return TABLE_ERROR_PNT;
   }
-  
-#ifndef NO_MMAP
-  /* no mmap support so immediate error */
-  if (table_p->ta_mmap != NULL) {
-    return TABLE_ERROR_MMAP_OP;
-  }
-#endif
   
   /* take the first entry */
   entry_p = first_entry(table_p, &linear);
@@ -2342,13 +2292,6 @@ int	table_adjust(table_t *table_p, const int bucket_n)
   if (table_p->ta_magic != TABLE_MAGIC) {
     return TABLE_ERROR_PNT;
   }
-  
-#ifndef NO_MMAP
-  /* no mmap support so immediate error */
-  if (table_p->ta_mmap != NULL) {
-    return TABLE_ERROR_MMAP_OP;
-  }
-#endif
   
   /*
    * NOTE: we walk through the entries and rehash them.  If we stored
@@ -3008,527 +2951,6 @@ int	table_this_r(table_t *table_p, table_linear_t *linear_p,
     }
   }
   SET_POINTER(data_size_p, entry_p->te_data_size);
-  
-  return TABLE_ERROR_NONE;
-}
-
-/******************************* mmap routines *******************************/
-
-/*
- * table_t *table_mmap
- *
- * DESCRIPTION:
- *
- * Mmap a table from a file that had been written to disk earlier via
- * table_write.
- *
- * RETURNS:
- *
- * A pointer to the new table structure which must be passed to
- * table_munmap to be deallocated.  On error a NULL is returned.
- *
- * ARGUMENTS:
- *
- * path - Table file to mmap in.
- *
- * error_p - Pointer to an integer which, if not NULL, will contain a
- * table error code.
- */
-table_t		*table_mmap(const char *path, int *error_p)
-{
-#ifdef NO_MMAP
-  
-  /* no mmap support so immediate error */
-  SET_POINTER(error_p, TABLE_ERROR_MMAP_NONE);
-  return NULL;
-  
-#else
-  
-  table_t	*table_p;
-  struct stat	sbuf;
-  int		fd, state;
-  
-  table_p = (table_t *)malloc(sizeof(table_t));
-  if (table_p == NULL) {
-    SET_POINTER(error_p, TABLE_ERROR_ALLOC);
-    return NULL;
-  }
-  
-  /* open the mmap file */
-  fd = open(path, O_RDONLY, 0);
-  if (fd < 0) {
-    free(table_p);
-    SET_POINTER(error_p, TABLE_ERROR_OPEN);
-    return NULL;
-  }
-  
-  /* get the file size */
-  if (fstat(fd, &sbuf) != 0) {
-    free(table_p);
-    SET_POINTER(error_p, TABLE_ERROR_OPEN);
-    return NULL;
-  }
-  
-  /* mmap the space and close the file */
-#ifdef __alpha
-  state = (MAP_SHARED | MAP_FILE | MAP_VARIABLE);
-#else
-  state = MAP_SHARED;
-#endif
-  
-  table_p->ta_mmap = (table_t *)mmap((caddr_t)0, sbuf.st_size, PROT_READ,
-				     state, fd, 0);
-  (void)close(fd);
-  
-  if (table_p->ta_mmap == (table_t *)MAP_FAILED) {
-    SET_POINTER(error_p, TABLE_ERROR_MMAP);
-    return NULL;
-  }  
-  
-  /* is the mmap file contain bad info or maybe another system type? */
-  if (table_p->ta_mmap->ta_magic != TABLE_MAGIC) {
-    SET_POINTER(error_p, TABLE_ERROR_PNT);
-    return NULL;
-  }
-  
-  /* sanity check on the file size */
-  if (table_p->ta_mmap->ta_file_size != sbuf.st_size) {
-    SET_POINTER(error_p, TABLE_ERROR_SIZE);
-    return NULL;
-  }
-  
-  /* copy the fields out of the mmap file into our memory version */
-  table_p->ta_magic = TABLE_MAGIC;
-  table_p->ta_flags = table_p->ta_mmap->ta_flags;
-  table_p->ta_bucket_n = table_p->ta_mmap->ta_bucket_n;
-  table_p->ta_entry_n = table_p->ta_mmap->ta_entry_n;
-  table_p->ta_data_align = table_p->ta_mmap->ta_data_align;
-  table_p->ta_buckets = TABLE_POINTER(table_p, table_entry_t **,
-				      table_p->ta_mmap->ta_buckets);
-  table_p->ta_linear.tl_magic = 0;
-  table_p->ta_linear.tl_bucket_c = 0;
-  table_p->ta_linear.tl_entry_c = 0;
-  /* mmap is already set */
-  table_p->ta_file_size = table_p->ta_mmap->ta_file_size;
-  
-  SET_POINTER(error_p, TABLE_ERROR_NONE);
-  return table_p;
-  
-#endif
-}
-
-/*
- * int table_munmap
- *
- * DESCRIPTION:
- *
- * Unmmap a table that was previously mmapped using table_mmap.
- *
- * RETURNS:
- *
- * Returns table error codes.
- *
- * ARGUMENTS:
- *
- * table_p - Mmaped table pointer to unmap.
- */
-int	table_munmap(table_t *table_p)
-{
-#ifdef NO_MMAP
-  
-  /* no mmap support so immediate error */
-  return TABLE_ERROR_MMAP_NONE;
-  
-#else
-  
-  if (table_p == NULL) {
-    return TABLE_ERROR_ARG_NULL;
-  }
-  if (table_p->ta_magic != TABLE_MAGIC) {
-    return TABLE_ERROR_PNT;
-  }
-  if (table_p->ta_mmap == NULL) {
-    return TABLE_ERROR_PNT;
-  }
-  
-  (void)munmap((caddr_t)table_p->ta_mmap, table_p->ta_file_size);
-  table_p->ta_magic = 0;
-  free(table_p);
-  return TABLE_ERROR_NONE;
-  
-#endif
-}
-
-/******************************* file routines *******************************/
-
-/*
- * int table_read
- *
- * DESCRIPTION:
- *
- * Read in a table from a file that had been written to disk earlier
- * via table_write.
- *
- * RETURNS:
- *
- * Success - Pointer to the new table structure which must be passed
- * to table_free to be deallocated.
- *
- * Failure - NULL
- *
- * ARGUMENTS:
- *
- * path - Table file to read in.
- *
- * error_p - Pointer to an integer which, if not NULL, will contain a
- * table error code.
- */
-table_t	*table_read(const char *path, int *error_p)
-{
-  unsigned int	size;
-  int		fd, ent_size;
-  FILE		*infile;
-  table_entry_t	entry, **bucket_p, *entry_p = NULL, *last_p;
-  unsigned long	pos;
-  table_t	*table_p;
-  
-  /* open the file */
-  fd = open(path, O_RDONLY, 0);
-  if (fd < 0) {
-    SET_POINTER(error_p, TABLE_ERROR_OPEN);
-    return NULL;
-  }
-  
-  /* allocate a table structure */
-  table_p = malloc(sizeof(table_t));
-  if (table_p == NULL) {
-    SET_POINTER(error_p, TABLE_ERROR_ALLOC);
-    return NULL;
-  }
-  
-  /* now open the fd to get buffered i/o */
-  infile = fdopen(fd, "r");
-  if (infile == NULL) {
-    SET_POINTER(error_p, TABLE_ERROR_OPEN);
-    return NULL;
-  }
-  
-  /* read the main table struct */
-  if (fread(table_p, sizeof(table_t), 1, infile) != 1) {
-    SET_POINTER(error_p, TABLE_ERROR_READ);
-    free(table_p);
-    return NULL;
-  }
-  table_p->ta_file_size = 0;
-  
-  /* is the mmap file contain bad info or maybe another system type? */
-  if (table_p->ta_magic != TABLE_MAGIC) {
-    SET_POINTER(error_p, TABLE_ERROR_PNT);
-    return NULL;
-  }
-  
-  /* allocate the buckets */
-  table_p->ta_buckets = (table_entry_t **)calloc(table_p->ta_bucket_n,
-						 sizeof(table_entry_t *));
-  if (table_p->ta_buckets == NULL) {
-    SET_POINTER(error_p, TABLE_ERROR_ALLOC);
-    free(table_p);
-    return NULL;
-  }
-  
-  if (fread(table_p->ta_buckets, sizeof(table_entry_t *), table_p->ta_bucket_n,
-	    infile) != (size_t)table_p->ta_bucket_n) {
-    SET_POINTER(error_p, TABLE_ERROR_READ);
-    free(table_p->ta_buckets);
-    free(table_p);
-    return NULL;
-  }
-  
-  /* read in the entries */
-  for (bucket_p = table_p->ta_buckets;
-       bucket_p < table_p->ta_buckets + table_p->ta_bucket_n;
-       bucket_p++) {
-    
-    /* skip null buckets */
-    if (*bucket_p == NULL) {
-      continue;
-    }
-    
-    /* run through the entry list */
-    last_p = NULL;
-    for (pos = *(unsigned long *)bucket_p;;
-	 pos = (unsigned long)entry_p->te_next_p) {
-      
-      /* read in the entry */
-      if (fseek(infile, pos, SEEK_SET) != 0) {
-	SET_POINTER(error_p, TABLE_ERROR_SEEK);
-	free(table_p->ta_buckets);
-	free(table_p);
-	if (entry_p != NULL) {
-	  free(entry_p);
-	}
-	/* the other table elements will not be freed */
-	return NULL;
-      }
-      if (fread(&entry, sizeof(struct table_shell_st), 1, infile) != 1) {
-	SET_POINTER(error_p, TABLE_ERROR_READ);
-	free(table_p->ta_buckets);
-	free(table_p);
-	if (entry_p != NULL) {
-	  free(entry_p);
-	}
-	/* the other table elements will not be freed */
-	return NULL;
-      }
-      
-      /* make a new entry */
-      ent_size = entry_size(table_p, entry.te_key_size, entry.te_data_size);
-      entry_p = (table_entry_t *)malloc(ent_size);
-      if (entry_p == NULL) {
-	SET_POINTER(error_p, TABLE_ERROR_ALLOC);
-	free(table_p->ta_buckets);
-	free(table_p);
-	/* the other table elements will not be freed */
-	return NULL;
-      }
-      entry_p->te_key_size = entry.te_key_size;
-      entry_p->te_data_size = entry.te_data_size;
-      entry_p->te_next_p = entry.te_next_p;
-      
-      if (last_p == NULL) {
-	*bucket_p = entry_p;
-      }
-      else {
-	last_p->te_next_p = entry_p;
-      }
-      
-      /* determine how much more we have to read */
-      size = ent_size - sizeof(struct table_shell_st);
-      if (fread(ENTRY_KEY_BUF(entry_p), sizeof(char), size, infile) != size) {
-	SET_POINTER(error_p, TABLE_ERROR_READ);
-	free(table_p->ta_buckets);
-	free(table_p);
-	free(entry_p);
-	/* the other table elements will not be freed */
-	return NULL;
-      }
-      
-      /* we are done if the next pointer is null */
-      if (entry_p->te_next_p == (unsigned long)0) {
-	break;
-      }
-      last_p = entry_p;
-    }
-  }
-  
-  (void)fclose(infile);
-  
-  SET_POINTER(error_p, TABLE_ERROR_NONE);
-  return table_p;
-}
-
-/*
- * int table_write
- *
- * DESCRIPTION:
- *
- * Write a table from memory to file.
- *
- * RETURNS:
- *
- * Success - TABLE_ERROR_NONE
- *
- * Failure - Table error code.
- *
- * ARGUMENTS:
- *
- * table_p - Pointer to the table that we are writing to the file.
- *
- * path - Table file to write out to.
- *
- * mode - Mode of the file.  This argument is passed on to open when
- * the file is created.
- */
-int	table_write(const table_t *table_p, const char *path, const int mode)
-{
-  int		fd, rem, ent_size;
-  unsigned int	bucket_c, bucket_size;
-  unsigned long	size;
-  table_entry_t	*entry_p, **buckets, **bucket_p, *next_p;
-  table_t	main_tab;
-  FILE		*outfile;
-  
-  if (table_p == NULL) {
-    return TABLE_ERROR_ARG_NULL;
-  }
-  if (table_p->ta_magic != TABLE_MAGIC) {
-    return TABLE_ERROR_PNT;
-  }
-  
-  fd = open(path, O_WRONLY | O_CREAT, mode);
-  if (fd < 0) {
-    return TABLE_ERROR_OPEN;
-  }
-  
-  outfile = fdopen(fd, "w");
-  if (outfile == NULL) {
-    return TABLE_ERROR_OPEN;
-  }
-  
-  /* allocate a block of sizes for each bucket */
-  bucket_size = sizeof(table_entry_t *) * table_p->ta_bucket_n;
-  if (table_p->ta_alloc_func == NULL) {
-    buckets = (table_entry_t **)malloc(bucket_size);
-  }
-  else {
-    buckets =
-      (table_entry_t **)table_p->ta_alloc_func(table_p->ta_mem_pool,
-					       bucket_size);
-  }
-  if (buckets == NULL) {
-    return TABLE_ERROR_ALLOC;
-  }
-  
-  /* make a copy of the main struct */
-  main_tab = *table_p;
-  
-  /* start counting the bytes */
-  size = 0;
-  size += sizeof(table_t);
-  
-  /* buckets go right after main struct */
-  main_tab.ta_buckets = (table_entry_t **)size;
-  size += sizeof(table_entry_t *) * table_p->ta_bucket_n;
-  
-  /* run through and count the buckets */
-  for (bucket_c = 0; bucket_c < table_p->ta_bucket_n; bucket_c++) {
-    bucket_p = table_p->ta_buckets + bucket_c;
-    if (*bucket_p == NULL) {
-      buckets[bucket_c] = NULL;
-      continue;
-    }
-    buckets[bucket_c] = (table_entry_t *)size;
-    for (entry_p = *bucket_p; entry_p != NULL; entry_p = entry_p->te_next_p) {
-      size += entry_size(table_p, entry_p->te_key_size, entry_p->te_data_size);
-      /*
-       * We now have to round the file to the nearest long so the
-       * mmaping of the longs in the entry structs will work.
-       */
-      rem = size & (sizeof(long) - 1);
-      if (rem > 0) {
-	size += sizeof(long) - rem;
-      }
-    }
-  }
-  /* add a \0 at the end to fill the last section */
-  size++;
-  
-  /* set the main fields */
-  main_tab.ta_linear.tl_magic = 0;
-  main_tab.ta_linear.tl_bucket_c = 0;
-  main_tab.ta_linear.tl_entry_c = 0;
-  main_tab.ta_mmap = NULL;
-  main_tab.ta_file_size = size;
-  
-  /*
-   * Now we can start the writing because we got the bucket offsets.
-   */
-  
-  /* write the main table struct */
-  size = 0;
-  if (fwrite(&main_tab, sizeof(table_t), 1, outfile) != 1) {
-    if (table_p->ta_free_func == NULL) {
-      free(buckets);
-    }
-    else {
-      (void)table_p->ta_free_func(table_p->ta_mem_pool, buckets, bucket_size);
-    }
-    return TABLE_ERROR_WRITE;
-  }
-  size += sizeof(table_t);
-  if (fwrite(buckets, sizeof(table_entry_t *), table_p->ta_bucket_n,
-	     outfile) != (size_t)table_p->ta_bucket_n) {
-    if (table_p->ta_free_func == NULL) {
-      free(buckets);
-    }
-    else {
-      (void)table_p->ta_free_func(table_p->ta_mem_pool, buckets, bucket_size);
-    }
-    return TABLE_ERROR_WRITE;
-  }
-  size += sizeof(table_entry_t *) * table_p->ta_bucket_n;
-  
-  /* write out the entries */
-  for (bucket_p = table_p->ta_buckets;
-       bucket_p < table_p->ta_buckets + table_p->ta_bucket_n;
-       bucket_p++) {
-    for (entry_p = *bucket_p; entry_p != NULL; entry_p = entry_p->te_next_p) {
-      
-      ent_size = entry_size(table_p, entry_p->te_key_size,
-			    entry_p->te_data_size);
-      size += ent_size;
-      /* round to nearest long here so we can write copy */
-      rem = size & (sizeof(long) - 1);
-      if (rem > 0) {
-	size += sizeof(long) - rem;
-      }
-      next_p = entry_p->te_next_p;
-      if (next_p != NULL) {
-	entry_p->te_next_p = (table_entry_t *)size;
-      }
-      
-      /* now write to disk */
-      if (fwrite(entry_p, ent_size, 1, outfile) != 1) {
-	if (table_p->ta_free_func == NULL) {
-	  free(buckets);
-	}
-	else {
-	  (void)table_p->ta_free_func(table_p->ta_mem_pool, buckets,
-				      bucket_size);
-	}
-	return TABLE_ERROR_WRITE;
-      }
-      
-      /* restore the next pointer */
-      if (next_p != NULL) {
-	entry_p->te_next_p = next_p;
-      }
-      
-      /* now write the padding information */
-      if (rem > 0) {
-	rem = sizeof(long) - rem;
-	/*
-	 * NOTE: this won't leave fseek'd space at the end but we
-	 * don't care there because there is no accessed memory
-	 * afterwards.  We write 1 \0 at the end to make sure.
-	 */
-	if (fseek(outfile, rem, SEEK_CUR) != 0) {
-	  if (table_p->ta_free_func == NULL) {
-	    free(buckets);
-	  }
-	  else {
-	    (void)table_p->ta_free_func(table_p->ta_mem_pool, buckets,
-					bucket_size);
-	  }
-	  return TABLE_ERROR_SEEK;
-	}
-      }
-    }
-  }
-  /*
-   * Write a \0 at the end of the file to make sure that the last
-   * fseek filled with nulls.
-   */
-  (void)fputc('\0', outfile);
-  
-  (void)fclose(outfile);
-  if (table_p->ta_free_func == NULL) {
-    free(buckets);
-  }
-  else if (! table_p->ta_free_func(table_p->ta_mem_pool, buckets,
-				   bucket_size)) {
-    return TABLE_ERROR_FREE;
-  }
   
   return TABLE_ERROR_NONE;
 }

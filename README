@@ -1,0 +1,66 @@
+-------------------------------------------------------------------------------
+
+Sortu Utility
+
+The sortu program is a replacement for the sort and uniq programs.
+It is common for Unix script writers to want to count how many
+separate patterns are in a file.  For example, if you have a list of
+addresses, you may want to see how many are from each state.  So you
+cut out the state part, sort these, and then pass them through uniq
+-c.  Sortu does all this for you in a fraction of the time.
+
+Sortu uses a hash table and some decent line processing to provide
+this functionality. It has some basic field and delimiter handling
+which should do most basic awk or cut features to separate out the
+field that you are sorting on.
+
+Arguments:
+
+To list all of the available options, use 'sortu --usage'.
+
+-b (--blank-ignore)
+	ignore blank lines
+-c (--cumulative-numbers)
+	show percentage along with count
+-C (--no-counts)
+	don't output string counts
+-d chars (--delimiter)
+	field delim string (default " ")
+-f number (--field)
+	 which field to use otherwise 1st
+-F format (--format)
+	output format: %k %n %l %p %c
+-k (--key-sort)
+	sort by key not count
+-l (--loose-fields)
+	ignores white space between fields
+-m number (--minimum-matches)
+	minimum # matches to show
+-M number (--maximum-matches)
+	maximum # matches to show
+-i (--insensitive-case)
+	perform case insensitive matches
+-n (--numbers)
+	treat field as signed long number
+-N (--float-numbers)
+	treat field as floating point
+-o (--order-sort)
+	output in order of discovery
+-p (--percentage-show)
+	show percentage along with count
+-r (--reverse-sort)
+	reverse the sort
+-s offset (--start-offset)
+	field starts at offet
+-S offset (--stop-offset)
+	field stops at offset
+-v (--verbose)
+	verbose
+file(s)
+	file(s) to process otherwise use standard-in
+
+Repository:
+
+The newest versions of the program are available via the web:
+
+	http://256.com/sources/sortu/

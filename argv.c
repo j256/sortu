@@ -16,7 +16,7 @@
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
  *
- * The author may be contacted at gray.watson@letters.com
+ * The author may be reached via http://256.com/gray/
  */
 
 #if defined(WIN32)
