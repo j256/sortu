@@ -20,10 +20,10 @@
  */
 
 /* argument variables */
-static	int		count_sort_b = 0;	/* sort by count not data */
 static	int		no_counts_b = 0;	/* don't output str counts */
 static	char		*delim_str = DEFAULT_DELIM; /* field delim char */
 static	int		field = -1;		/* field to use */
+static	int		key_sort_b = 0;		/* sort by key not count */
 static	int		min_matches = 0;	/* minimum number of matches */
 static	int		max_matches = 0;	/* max number of matches */
 static	int		numbers_b = 0;		/* fields are numbers */
@@ -32,14 +32,14 @@ static	argv_array_t	files;			/* work files */
 
 /* argument array */
 static	argv_t	args[] = {
-  { 'c',	"count-sort",	ARGV_BOOL_INT,		&count_sort_b,
-    NULL,		"sort by the count not key" },
   { 'C',	"no-counts",	ARGV_BOOL_INT,		&no_counts_b,
     NULL,		"don't output string counts" },
   { 'd',	"delimiter",	ARGV_CHAR_P,		&delim_str,
-    "char",		"field delimiter string (default \" \")" },
+    "chars",		"field delim string (default \" \")" },
   { 'f',	"field",	ARGV_INT,		&field,
     "number",		"which field to use otherwise 1st" },
+  { 'k',	"key-sort",	ARGV_BOOL_INT,		&key_sort_b,
+    NULL,		"sort by key not count" },
   { 'm',	"minimum-matches", ARGV_INT,		&min_matches,
     "number",		"minimum # matches to show" },
   { 'M',	"maximum-matches", ARGV_INT,		&max_matches,
@@ -49,7 +49,7 @@ static	argv_t	args[] = {
   { 'v',	"verbose",	ARGV_BOOL_INT,		&verbose_b,
     NULL,		"verbose mode" },
   { ARGV_MAYBE,	NULL,		ARGV_CHAR_P | ARGV_FLAG_ARRAY, &files,
-    "file(s)",		"file(s) to process" },
+    "file(s)",		"file(s) to process else stdin" },
   { ARGV_LAST }
 };
 
@@ -91,7 +91,7 @@ static	int	count_compare(const void *key1, const int key1_size,
   const unsigned long	*ulong1_p, *ulong2_p;
   const char		*str1_p, *str2_p;
   
-  if (count_sort_b) {
+  if (key_sort_b) {
     if (numbers_b) {
       /* reverse numeric sort */
       ulong1_p = key1;
