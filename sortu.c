@@ -142,13 +142,11 @@ int	main(int argc, char **argv)
   }
   
   /* set table alignment */
-  if (! no_counts_b) {
-    ret = table_set_data_alignment(tab, sizeof(long));
-    if (ret != TABLE_ERROR_NONE) {
-      (void)fprintf(stderr, "%s: could not set table alignment: %s\n",
-		    argv_program, table_strerror(ret));
-      exit(1);
-    }
+  ret = table_set_data_alignment(tab, sizeof(long));
+  if (ret != TABLE_ERROR_NONE) {
+    (void)fprintf(stderr, "%s: could not set table alignment: %s\n",
+		  argv_program, table_strerror(ret));
+    exit(1);
   }
   
   file_c = 0;
@@ -198,14 +196,9 @@ int	main(int argc, char **argv)
 	key_size = -1;
       }
       
-      if (no_counts_b) {
-	ret = table_insert(tab, key_p, key_size, NULL, 0, NULL, 0);
-      }
-      else {
-	count = 1;
-	ret = table_insert(tab, key_p, key_size, &count, sizeof(count),
-			   (void **)&count_p, 0);
-      }
+      count = 1;
+      ret = table_insert(tab, key_p, key_size, &count, sizeof(count),
+			 (void **)&count_p, 0);
       if (ret != TABLE_ERROR_NONE) {
 	if (ret != TABLE_ERROR_OVERWRITE) {
 	  (void)fprintf(stderr, "%s: could not add key to table: %s\n",
@@ -213,9 +206,7 @@ int	main(int argc, char **argv)
 	  exit(1);
 	}
 	
-	if (! no_counts_b) {
-	  (*count_p)++;
-	}
+	(*count_p)++;
       }
     }
     

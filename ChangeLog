@@ -1,3 +1,7 @@
+Thu Jun 22 17:45:30 2000  Gray Watson  <gray@256.com>
+
+	* Fixed the -C --no-counts flag.
+
 Mon Jun 12 16:40:13 2000  Gray Watson  <gray@256.com>
 
 	* Added -m (min-matches) and -M (max-matches) functionality.
