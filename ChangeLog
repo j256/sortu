@@ -1,3 +1,7 @@
+Tue Aug  8 11:40:23 2000  Gray Watson  <gray@256.com>
+
+	* Added case insensitive flag.  -i.
+
 Mon Jul 10 15:56:10 2000  Gray Watson  <gray@256.com>
 
 	* Added ignore-blanks (-b) flag.

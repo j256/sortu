@@ -24,6 +24,7 @@ static	int		ignore_blanks_b = 0;	/* ignore blank lines */
 static	int		no_counts_b = 0;	/* don't output str counts */
 static	char		*delim_str = DEFAULT_DELIM; /* field delim char */
 static	int		field = -1;		/* field to use */
+static	int		case_insens_b = 0;	/* case insensitive matches */
 static	int		key_sort_b = 0;		/* sort by key not count */
 static	int		min_matches = 0;	/* minimum number of matches */
 static	int		max_matches = 0;	/* max number of matches */
@@ -47,6 +48,9 @@ static	argv_t	args[] = {
     "number",		"minimum # matches to show" },
   { 'M',	"maximum-matches", ARGV_INT,		&max_matches,
     "number",		"maximum # matches to show" },
+  { 'i',	"insensitive-case", ARGV_BOOL_INT,	&case_insens_b,
+    NULL,		"perform case insensitive matches" },
+  { ARGV_OR },
   { 'n',	"numbers",	ARGV_BOOL_INT,		&numbers_b,
     NULL,		"treat field as signed long number" },
   { 'v',	"verbose",	ARGV_BOOL_INT,		&verbose_b,
@@ -210,6 +214,12 @@ int	main(int argc, char **argv)
 	key_size = sizeof(value);
       }
       else {
+	if (case_insens_b) {
+	  /* lower case the string */
+	  for (line_p = tok; *line_p != '\0'; line_p++) {
+	    *line_p = tolower(*line_p);
+	  }
+	}
 	key_p = tok;
 	key_size = -1;
       }
