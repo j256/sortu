@@ -33,6 +33,9 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#define HAVE_STRING_H 1
+#define HAVE_STDLIB_H 1
+
 #if HAVE_STRING_H
 # include <string.h>
 #endif

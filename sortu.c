@@ -24,6 +24,8 @@ static	int		count_sort_b = 0;	/* sort by count not data */
 static	int		no_counts_b = 0;	/* don't output str counts */
 static	char		*delim_str = DEFAULT_DELIM; /* field delim char */
 static	int		field = -1;		/* field to use */
+static	int		min_matches = 0;	/* minimum number of matches */
+static	int		max_matches = 0;	/* max number of matches */
 static	int		numbers_b = 0;		/* fields are numbers */
 static	int		verbose_b = 0;		/* verbose flag */
 static	argv_array_t	files;			/* work files */
@@ -38,6 +40,10 @@ static	argv_t	args[] = {
     "char",		"field delimiter string (default \" \")" },
   { 'f',	"field",	ARGV_INT,		&field,
     "number",		"which field to use otherwise 1st" },
+  { 'm',	"minimum-matches", ARGV_INT,		&min_matches,
+    "number",		"minimum # matches to show" },
+  { 'M',	"maximum-matches", ARGV_INT,		&max_matches,
+    "number",		"maximum # matches to show" },
   { 'n',	"numbers",	ARGV_BOOL_INT,		&numbers_b,
     NULL,		"treat field as signed long number" },
   { 'v',	"verbose",	ARGV_BOOL_INT,		&verbose_b,
@@ -251,6 +257,12 @@ int	main(int argc, char **argv)
       (void)fprintf(stderr, "%s: could not get table entry: %s\n",
 		    argv_program, table_strerror(ret));
       exit(1);
+    }
+    
+    /* limit the matches if necessary */
+    if (*count_p < min_matches
+	|| (max_matches > 0 && *count_p > max_matches)) {
+      continue;
     }
     
     if (no_counts_b) {
