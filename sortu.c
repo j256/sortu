@@ -41,7 +41,7 @@ static	int		order_sort_b = 0;	/* keep order when sorting */
 static	int		show_percentage_b = 0;	/* show percentage vals */
 static	int		reverse_sort_b = 0;	/* reverse the sort order */
 static	int		start_offset = 0;	/* field starts at offset */
-static	int		stop_offset = 0;	/* field stops at offset */
+static	int		stop_offset = -1;	/* field stops at offset */
 static	int		verbose_b = 0;		/* verbose flag */
 static	argv_array_t	files;			/* work files */
 
@@ -50,7 +50,7 @@ static	argv_t	args[] = {
   { 'b',	"blank-ignore",	ARGV_BOOL_INT,		&ignore_blanks_b,
     NULL,		"ignore blank lines" },
   { 'c',	"cumulative-numbers", ARGV_BOOL_INT,	&cumulative_b,
-    NULL,		"show percentage along with count" },
+    NULL,		"show cumulative count numbers" },
   { 'C',	"no-counts",	ARGV_BOOL_INT,		&no_counts_b,
     NULL,		"don't output string counts" },
   { 'd',	"delimiter",	ARGV_CHAR_P,		&delim_str,
@@ -205,6 +205,7 @@ static	int	count_compare(const void *key1_p, const int key1_size,
   const double	*double1_p, *double2_p;
   const long	*long1_p, *long2_p;
   const char	*str1_p, *str2_p;
+  double	double_res;
   int		result;
   
   if (order_sort_b) {
@@ -241,11 +242,28 @@ static	int	count_compare(const void *key1_p, const int key1_size,
     /* reverse numeric sort */
     double1_p = key1_p;
     double2_p = key2_p;
+    double_res = *double1_p - *double2_p;
     if (reverse_sort_b) {
-      return *double2_p - *double1_p;
+      if (double_res > 0.0) {
+	return -1;
+      }
+      else if (double_res < 0.0) {
+	return 1;
+      }
+      else {
+	return 0;
+      }
     }
     else {
-      return *double1_p - *double2_p;
+      if (double_res > 0.0) {
+	return 1;
+      }
+      else if (double_res < 0.0) {
+	return -1;
+      }
+      else {
+	return 0;
+      }
     }
   }
   else {
@@ -343,7 +361,7 @@ int	main(int argc, char **argv)
 	   *line_bounds_p != '\n' && *line_bounds_p != '\0';
 	   line_bounds_p++) {
       }
-      if (stop_offset > 0 && line_bounds_p > line + stop_offset + 1) {
+      if (stop_offset >= 0 && line_bounds_p > line + stop_offset + 1) {
 	/* it is +1 because stop offset of 3 means 4 is the bounds */
 	line_bounds_p = line + stop_offset + 1;
       }

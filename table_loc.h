@@ -104,26 +104,6 @@
         } while(0)
 
 /*
- * The following macros take care of the mmap case.  When we are
- * mmaping a table from a disk file, all of the pointers in the table
- * structures are replaced with offsets into the file.  The following
- * macro, for each pointer, adds the starting address of the mmaped
- * section onto each pointer/offset turning it back into a legitimate
- * pointer.
- */
-#ifdef NO_MMAP
-
-#define TABLE_POINTER(table, type, pnt)		(pnt)
-
-#else
-
-#define TABLE_POINTER(tab_p, type, pnt)	\
-     ((tab_p)->ta_mmap == NULL || (pnt) == NULL ? (pnt) : \
-      (type)((char *)((tab_p)->ta_mmap) + (long)(pnt)))
-
-#endif
-
-/*
  * Macros to get at the key and the data pointers
  */
 #define ENTRY_KEY_BUF(entry_p)		((entry_p)->te_key_buf)
@@ -175,7 +155,6 @@ typedef struct table_st {
   unsigned int		ta_data_align;	/* data alignment value */
   table_entry_t		**ta_buckets;	/* array of linked lists */
   table_linear_t	ta_linear;	/* linear tracking */
-  struct table_st	*ta_mmap;	/* mmaped table */
   unsigned long		ta_file_size;	/* size of on-disk space */
   
   void			*ta_mem_pool;	/* pointer to some memory pool */

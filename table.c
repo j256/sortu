@@ -100,7 +100,7 @@ static	table_entry_t	*first_entry(const table_t *table_p,
 	linear_p->tl_bucket_c = bucket_c;
 	linear_p->tl_entry_c = 0;
       }
-      return TABLE_POINTER(table_p, table_entry_t *, entry_p);
+      return entry_p;
     }
   }
   
@@ -162,13 +162,13 @@ static	table_entry_t	*next_entry(const table_t *table_p,
     if (entry_p == NULL) {
       break;
     }
-    entry_p = TABLE_POINTER(table_p, table_entry_t *, entry_p)->te_next_p;
+    entry_p = entry_p->te_next_p;
   }
   
   /* did we find an entry in the current bucket? */
   if (entry_p != NULL) {
     SET_POINTER(error_p, TABLE_ERROR_NONE);
-    return TABLE_POINTER(table_p, table_entry_t *, entry_p);
+    return entry_p;
   }
   
   /* find the first entry in the next non-empty bucket */
@@ -179,7 +179,7 @@ static	table_entry_t	*next_entry(const table_t *table_p,
     entry_p = table_p->ta_buckets[linear_p->tl_bucket_c];
     if (entry_p != NULL) {
       SET_POINTER(error_p, TABLE_ERROR_NONE);
-      return TABLE_POINTER(table_p, table_entry_t *, entry_p);
+      return entry_p;
     }
   }
   
@@ -242,7 +242,7 @@ static	table_entry_t	*this_entry(const table_t *table_p,
     if (entry_p == NULL) {
       break;
     }
-    entry_p = TABLE_POINTER(table_p, table_entry_t *, entry_p)->te_next_p;
+    entry_p = entry_p->te_next_p;
   }
   
   /* did we find an entry in the current bucket? */
@@ -252,7 +252,7 @@ static	table_entry_t	*this_entry(const table_t *table_p,
   }
   else {
     SET_POINTER(error_p, TABLE_ERROR_NONE);
-    return TABLE_POINTER(table_p, table_entry_t *, entry_p);
+    return entry_p;
   }
 }
 
@@ -1879,7 +1879,7 @@ int	table_retrieve(table_t *table_p,
   for (entry_p = buckets[bucket];
        entry_p != NULL;
        entry_p = entry_p->te_next_p) {
-    entry_p = TABLE_POINTER(table_p, table_entry_t *, entry_p);
+    entry_p = entry_p;
     if (entry_p->te_key_size == ksize
 	&& memcmp(ENTRY_KEY_BUF(entry_p), key_buf, ksize) == 0) {
       break;
@@ -2647,7 +2647,7 @@ int	table_this(table_t *table_p,
     if (entry_p == NULL) {
       break;
     }
-    entry_p = TABLE_POINTER(table_p, table_entry_t *, entry_p)->te_next_p;
+    entry_p = entry_p->te_next_p;
   }
 
   /* is this a NOT_FOUND or a LINEAR error */
@@ -2926,9 +2926,8 @@ int	table_this_r(table_t *table_p, table_linear_t *linear_p,
   /* find the entry which is the nth in the list */
   for (entry_c = linear_p->tl_entry_c,
 	 entry_p = table_p->ta_buckets[linear_p->tl_bucket_c];
-       entry_p != NULL && entry_c > 0;
-       entry_c--, entry_p = TABLE_POINTER(table_p, table_entry_t *,
-					  entry_p)->te_next_p) {
+       entry_c > 0 && entry_p != NULL;
+       entry_c--, entry_p = entry_p->te_next_p) {
   }
   
   if (entry_p == NULL) {

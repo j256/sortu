@@ -40,7 +40,7 @@ cat > $EXPECTED <<EOF
 1 4
 EOF
 
-sortu $TEST1 > $OUTPUT
+./sortu $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -61,6 +61,7 @@ cat > $EXPECTED <<EOF
 1 4
 EOF
 
+./sortu $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -81,7 +82,7 @@ cat > $EXPECTED <<EOF
 1 4
 EOF
 
-sortu $TEST1 > $OUTPUT
+./sortu $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -103,7 +104,7 @@ cat > $EXPECTED <<EOF
 2 3
 EOF
 
-sortu $TEST1 > $OUTPUT
+./sortu $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -124,7 +125,7 @@ cat > $EXPECTED <<EOF
 1 c
 EOF
 
-sortu $TEST1 > $OUTPUT
+./sortu $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -143,7 +144,7 @@ cat > $EXPECTED <<EOF
 1 3  c
 EOF
 
-sortu $TEST1 > $OUTPUT
+./sortu $TEST1 > $OUTPUT
 check
 
 ###############################################################################
@@ -168,7 +169,7 @@ cat > $EXPECTED <<EOF
 1 4
 EOF
 
-sortu -b $TEST1 > $OUTPUT
+./sortu -b $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -189,7 +190,7 @@ cat > $EXPECTED <<EOF
 1 4 9
 EOF
 
-sortu -c $TEST1 > $OUTPUT
+./sortu -c $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -210,7 +211,7 @@ cat > $EXPECTED <<EOF
 4
 EOF
 
-sortu -C $TEST1 > $OUTPUT
+./sortu -C $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -231,7 +232,7 @@ cat > $EXPECTED <<EOF
 1 d
 EOF
 
-sortu -d=, -f 2  $TEST1 > $OUTPUT
+./sortu -d=, -f 2  $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -252,7 +253,7 @@ cat > $EXPECTED <<EOF
 1 d
 EOF
 
-sortu -d=, -f 2  $TEST1 > $OUTPUT
+./sortu -d=, -f 2  $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -274,7 +275,7 @@ cat > $EXPECTED <<EOF
 1 3
 EOF
 
-sortu -r $TEST1 > $OUTPUT
+./sortu -r $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -293,7 +294,7 @@ cat > $EXPECTED <<EOF
 1 3
 EOF
 
-sortu -f 2 -l $TEST1 > $OUTPUT
+./sortu -f 2 -l $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -311,7 +312,7 @@ cat > $EXPECTED <<EOF
 2 1
 EOF
 
-sortu -m 2 $TEST1 > $OUTPUT
+./sortu -m 2 $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -330,7 +331,7 @@ cat > $EXPECTED <<EOF
 1 3
 EOF
 
-sortu -M 1 $TEST1 > $OUTPUT
+./sortu -M 1 $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -351,7 +352,7 @@ cat > $EXPECTED <<EOF
 1 d
 EOF
 
-sortu -i $TEST1 > $OUTPUT
+./sortu -i $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -370,29 +371,27 @@ cat > $EXPECTED <<EOF
 1 10
 EOF
 
-sortu -n $TEST1 > $OUTPUT
+./sortu -n $TEST1 > $OUTPUT
 check
 
 ########################################
-# ERROR
-#
+
 NAME="number float argument"
-echo "WARNING: test fails: $NAME"
 
-#cat > $TEST1 <<EOF
-#1.1 a
-#10  b
-#1   c
-#EOF
-#
-#cat > $EXPECTED <<EOF
-#1 1.00
-#1 1.10
-#1 10.00
-#EOF
+cat > $TEST1 <<EOF
+1.1 a
+10  b
+1   c
+EOF
 
-#sortu -N $TEST1 > $OUTPUT
-#check
+cat > $EXPECTED <<EOF
+1 1.00
+1 1.10
+1 10.00
+EOF
+
+./sortu -N $TEST1 > $OUTPUT
+check
 
 ########################################
 
@@ -410,7 +409,7 @@ cat > $EXPECTED <<EOF
 1 2
 EOF
 
-sortu -o $TEST1 > $OUTPUT
+./sortu -o $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -430,7 +429,7 @@ cat > $EXPECTED <<EOF
 2 50% 1
 EOF
 
-sortu -p $TEST1 > $OUTPUT
+./sortu -p $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -451,7 +450,7 @@ cat > $EXPECTED <<EOF
 1 1
 EOF
 
-sortu -r $TEST1 > $OUTPUT
+./sortu -r $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -472,12 +471,12 @@ cat > $EXPECTED <<EOF
 1 4
 EOF
 
-sortu -s 1 $TEST1 > $OUTPUT
+./sortu -s 1 $TEST1 > $OUTPUT
 check
 
 ########################################
 
-NAME="start offset argument"
+NAME="stop offset argument"
 
 cat > $TEST1 <<EOF
 a4
@@ -491,7 +490,7 @@ cat > $EXPECTED <<EOF
 2 b
 EOF
 
-sortu -S 1 $TEST1 > $OUTPUT
+./sortu -S 0 $TEST1 > $OUTPUT
 check
 
 ########################################
@@ -516,7 +515,31 @@ Count: Data:
 4 Total     
 EOF
 
-sortu -v $TEST1 > $OUTPUT
+./sortu -v $TEST1 > $OUTPUT
+check
+
+###############################################################################
+
+NAME="format argument"
+
+cat > $TEST1 <<EOF
+4
+1
+33
+33
+33
+222
+222
+EOF
+
+cat > $EXPECTED <<EOF
+1,1,1
+4,1,1
+222,3,2
+33,2,3
+EOF
+
+./sortu -F '%k,%l,%n' $TEST1 > $OUTPUT
 check
 
 ###############################################################################
