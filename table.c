@@ -34,7 +34,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef unix
+#ifdef __unix__
 
 #include <unistd.h>
 
