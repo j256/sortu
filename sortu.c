@@ -19,8 +19,8 @@
 
 /* struct for the order/count stuff */
 typedef struct {
-  unsigned long	so_count;			/* count that we have seen the item */
-  int		so_order;			/* order that we get it for -o */
+  unsigned long	so_count;		/* count that we have seen the item */
+  int		so_order;		/* order that we get it for -o */
 } sortu_t;
 
 /* argument variables */
@@ -39,8 +39,8 @@ static	int		numbers_float_b = 0;	/* fields are floats */
 static	int		order_sort_b = 0;	/* keep order when sorting */
 static	int		show_percentage_b = 0;	/* show percentage vals */
 static	int		reverse_sort_b = 0;	/* reverse the sort order */
-static	int		start_offset = 0;	/* field starts at this offset */
-static	int		stop_offset = 0;	/* field stops at this offset */
+static	int		start_offset = 0;	/* field starts at offset */
+static	int		stop_offset = 0;	/* field stops at offset */
 static	int		verbose_b = 0;		/* verbose flag */
 static	argv_array_t	files;			/* work files */
 
@@ -264,8 +264,9 @@ int	main(int argc, char **argv)
 	   *line_bounds_p != '\n' && *line_bounds_p != '\0';
 	   line_bounds_p++) {
       }
-      if (stop_offset > 0 && line_bounds_p > line + stop_offset) {
-	line_bounds_p = line + stop_offset;
+      if (stop_offset > 0 && line_bounds_p > line + stop_offset + 1) {
+	/* it is +1 because stop offset of 3 means 4 is the bounds */
+	line_bounds_p = line + stop_offset + 1;
       }
       *line_bounds_p = '\0';
       
