@@ -1,3 +1,7 @@
+Mon Oct  2 19:21:21 2000  Gray Watson  <gray@whopper.be.256.com>
+
+	* Added -l loose-fields switch to better handle wierd column output.
+
 Tue Aug  8 11:40:23 2000  Gray Watson  <gray@256.com>
 
 	* Added case insensitive flag.  -i.

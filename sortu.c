@@ -26,6 +26,7 @@ static	char		*delim_str = DEFAULT_DELIM; /* field delim char */
 static	int		field = -1;		/* field to use */
 static	int		case_insens_b = 0;	/* case insensitive matches */
 static	int		key_sort_b = 0;		/* sort by key not count */
+static	int		loose_fields_b = 0;	/* loose field match */
 static	int		min_matches = 0;	/* minimum number of matches */
 static	int		max_matches = 0;	/* max number of matches */
 static	int		numbers_b = 0;		/* fields are numbers */
@@ -44,6 +45,8 @@ static	argv_t	args[] = {
     "number",		"which field to use otherwise 1st" },
   { 'k',	"key-sort",	ARGV_BOOL_INT,		&key_sort_b,
     NULL,		"sort by key not count" },
+  { 'l',	"loose-fields",	ARGV_BOOL_INT,		&loose_fields_b,
+    NULL,		"ignores white space between fields" },
   { 'm',	"minimum-matches", ARGV_INT,		&min_matches,
     "number",		"minimum # matches to show" },
   { 'M',	"maximum-matches", ARGV_INT,		&max_matches,
@@ -196,10 +199,17 @@ int	main(int argc, char **argv)
       /* default is the entire line */
       tok = line;
       line_p = line;
-      for (field_c = field - 1; field_c >= 0; field_c--) {
+      for (field_c = field - 1; field_c >= 0;) {
 	tok = strsep(&line_p, delim_str);
 	if (tok == NULL) {
 	  break;
+	}
+	/*
+	 * we only decrement the field counter if loose-fields is not
+	 * on and we have an empty token
+	 */
+	if (! (loose_fields_b && *tok == '\0')) {
+	  field_c--;
 	}
       }
       
