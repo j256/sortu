@@ -30,6 +30,7 @@ static	int		loose_fields_b = 0;	/* loose field match */
 static	int		min_matches = 0;	/* minimum number of matches */
 static	int		max_matches = 0;	/* max number of matches */
 static	int		numbers_b = 0;		/* fields are numbers */
+static	int		reverse_sort_b = 0;	/* reverse the sort order */
 static	int		verbose_b = 0;		/* verbose flag */
 static	argv_array_t	files;			/* work files */
 
@@ -56,6 +57,8 @@ static	argv_t	args[] = {
   { ARGV_OR },
   { 'n',	"numbers",	ARGV_BOOL_INT,		&numbers_b,
     NULL,		"treat field as signed long number" },
+  { 'r',	"reverse-sort",	ARGV_BOOL_INT,		&reverse_sort_b,
+    NULL,		"reverse the sort" },
   { 'v',	"verbose",	ARGV_BOOL_INT,		&verbose_b,
     NULL,		"verbose mode" },
   { ARGV_MAYBE,	NULL,		ARGV_CHAR_P | ARGV_FLAG_ARRAY, &files,
@@ -106,7 +109,12 @@ static	int	count_compare(const void *key1, const int key1_size,
   if (! key_sort_b) {
     long1_p = data1;
     long2_p = data2;
-    result = *long2_p - *long1_p;
+    if (reverse_sort_b) {
+      result = *long1_p - *long2_p;
+    }
+    else {
+      result = *long2_p - *long1_p;
+    }
     /* if the count is == then sort by key */
     if (result != 0) {
       return result;
@@ -117,13 +125,23 @@ static	int	count_compare(const void *key1, const int key1_size,
     /* reverse numeric sort */
     ulong1_p = key1;
     ulong2_p = key2;
-    return *ulong1_p - *ulong2_p;
+    if (reverse_sort_b) {
+      return *ulong2_p - *ulong1_p;
+    }
+    else {
+      return *ulong1_p - *ulong2_p;
+    }
   }
   else {
     /* forward string sort */
     str1_p = key1;
     str2_p = key2;
-    return strcmp(str1_p, str2_p);
+    if (reverse_sort_b) {
+      return strcmp(str2_p, str1_p);
+    }
+    else {
+      return strcmp(str1_p, str2_p);
+    }
   }
 }
 
