@@ -16,6 +16,9 @@ clean :
 	rm -f a.out core *.o *.t *.cpp
 	rm -f $(PROG)
 
+tests :
+	sh test_sortu.sh
+
 $(PROG) : $(OBJS)
 	rm -f $@
 	$(CC) $(LDFLAGS) $(OBJS) $(LIBS)
