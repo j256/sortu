@@ -1,3 +1,11 @@
+Mon Jul 10 15:56:10 2000  Gray Watson  <gray@256.com>
+
+	* Added ignore-blanks (-b) flag.
+
+	* If sort by count then added secondary sort by key.
+
+	* If -C then sort by key (-k) also enabled.
+
 Thu Jun 22 17:45:30 2000  Gray Watson  <gray@256.com>
 
 	* Fixed the -C --no-counts flag.
@@ -5,4 +13,3 @@ Thu Jun 22 17:45:30 2000  Gray Watson  <gray@256.com>
 Mon Jun 12 16:40:13 2000  Gray Watson  <gray@256.com>
 
 	* Added -m (min-matches) and -M (max-matches) functionality.
-

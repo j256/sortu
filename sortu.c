@@ -20,6 +20,7 @@
  */
 
 /* argument variables */
+static	int		ignore_blanks_b = 0;	/* ignore blank lines */
 static	int		no_counts_b = 0;	/* don't output str counts */
 static	char		*delim_str = DEFAULT_DELIM; /* field delim char */
 static	int		field = -1;		/* field to use */
@@ -32,6 +33,8 @@ static	argv_array_t	files;			/* work files */
 
 /* argument array */
 static	argv_t	args[] = {
+  { 'b',	"blank-ignore",	ARGV_BOOL_INT,		&ignore_blanks_b,
+    NULL,		"ignore blank lines" },
   { 'C',	"no-counts",	ARGV_BOOL_INT,		&no_counts_b,
     NULL,		"don't output string counts" },
   { 'd',	"delimiter",	ARGV_CHAR_P,		&delim_str,
@@ -90,25 +93,30 @@ static	int	count_compare(const void *key1, const int key1_size,
   const long		*long1_p, *long2_p;
   const unsigned long	*ulong1_p, *ulong2_p;
   const char		*str1_p, *str2_p;
+  int			result;
   
-  if (key_sort_b) {
-    if (numbers_b) {
-      /* reverse numeric sort */
-      ulong1_p = key1;
-      ulong2_p = key2;
-      return *ulong1_p - *ulong2_p;
-    }
-    else {
-      /* forward string sort */
-      str1_p = key1;
-      str2_p = key2;
-      return strcmp(str1_p, str2_p);
-    }
-  }
-  else {
+  /* if we aren't sorting by key then sort the count */
+  if (! key_sort_b) {
     long1_p = data1;
     long2_p = data2;
-    return *long2_p - *long1_p;
+    result = *long2_p - *long1_p;
+    /* if the count is == then sort by key */
+    if (result != 0) {
+      return result;
+    }
+  }
+  
+  if (numbers_b) {
+    /* reverse numeric sort */
+    ulong1_p = key1;
+    ulong2_p = key2;
+    return *ulong1_p - *ulong2_p;
+  }
+  else {
+    /* forward string sort */
+    str1_p = key1;
+    str2_p = key2;
+    return strcmp(str1_p, str2_p);
   }
 }
 
@@ -125,6 +133,11 @@ int	main(int argc, char **argv)
   
   argv_process(args, argc, argv);
   
+  /* if we aren't showing the counts, we might as well sort by the key */
+  if (no_counts_b) {
+    key_sort_b = 1;
+  }
+
   /* allocate table */
   tab = table_alloc(0, &ret);
   if (tab == NULL) {
@@ -170,6 +183,11 @@ int	main(int argc, char **argv)
       for (line_p = line; *line_p != '\n' && *line_p != '\0'; line_p++) {
       }
       *line_p = '\0';
+      
+      /* if blank line then maybe ignore it */
+      if (line[0] == '\0' && ignore_blanks_b) {
+	continue;
+      }
       
       /* default is the entire line */
       tok = line;
@@ -261,14 +279,15 @@ int	main(int argc, char **argv)
       continue;
     }
     
-    if (no_counts_b) {
-      (void)printf("%.*s\n", key_size, (char *)key_p);
+    if (! no_counts_b) {
+      (void)printf("%10lu ", *count_p);
     }
-    else if (numbers_b) {
-      (void)printf("%10lu %10ld\n", *count_p, *(long *)key_p);
+    
+    if (numbers_b) {
+      (void)printf("%10ld\n", *(long *)key_p);
     }
     else {
-      (void)printf("%10lu %.*s\n", *count_p, key_size, (char *)key_p);
+      (void)printf("%.*s\n", key_size, (char *)key_p);
     }
   }
   
