@@ -7,7 +7,7 @@ CC	= gcc
 PROG	= sortu
 OBJS	= sortu.o argv.o compat.o strsep.o table.o
 
-CFLAGS	= -g $(CCFLS)
+CFLAGS	= -g -Wall $(CCFLS)
 DESTDIR	= /usr/local/local/sbin
 
 all : $(PROG)

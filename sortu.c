@@ -29,6 +29,7 @@ static	int		cumulative_b = 0;	/* show cumulative numbers */
 static	int		no_counts_b = 0;	/* don't output str counts */
 static	char		*delim_str = DEFAULT_DELIM; /* field delim char */
 static	int		field = -1;		/* field to use */
+static	char		*format_string = 0L;	/* format argument */
 static	int		case_insens_b = 0;	/* case insensitive matches */
 static	int		key_sort_b = 0;		/* sort by key not count */
 static	int		loose_fields_b = 0;	/* loose field match */
@@ -56,6 +57,8 @@ static	argv_t	args[] = {
     "chars",		"field delim string (default \" \")" },
   { 'f',	"field",	ARGV_INT,		&field,
     "number",		"which field to use otherwise 1st" },
+  { 'F',	"format",	ARGV_CHAR_P,		&format_string,
+    "format",		"output format: %k %n %l %p %c" },
   { 'k',	"key-sort",	ARGV_BOOL_INT,		&key_sort_b,
     NULL,		"sort by key not count" },
   { 'l',	"loose-fields",	ARGV_BOOL_INT,		&loose_fields_b,
@@ -87,6 +90,82 @@ static	argv_t	args[] = {
     "file(s)",		"file(s) to process else stdin" },
   { ARGV_LAST }
 };
+
+/*
+ * static void print_format
+ *
+ * DESCRIPTION:
+ *
+ * Print out a formated output line using the following tags: %k for
+ * the key, %l for the key-length, %n for the number of hits, and %p
+ * for the percentage of total.
+ *
+ * RETURNS:
+ *
+ * None.
+ *
+ * ARGUMENTS:
+ *
+ * key -> Key string.
+ *
+ * key_len -> Length of the key.
+ *
+ * key_n -> Number of keys found.
+ *
+ * subtotal -> Cumulative total count.
+ *
+ * percent -> Percentage of total.
+ */
+static	void	print_format(const char *key, const int key_len,
+			     const int key_n, const int subtotal,
+			     const int percent)
+{
+  const char	*format_p;
+  
+  for (format_p = format_string; *format_p != '\0'; format_p++) {
+    if (*format_p != '%' || *(format_p + 1) == '\0') {
+      fputc(*format_p, stdout);
+      continue;
+    }
+    format_p++;
+    
+    switch (*format_p) {
+      
+    case 'k':
+      if (numbers_b) {
+	fprintf(stdout, "%ld", *(long *)key);
+      }
+      else if (numbers_float_b) {
+	fprintf(stdout, "%.2f", *(double *)key);
+      }
+      else {
+	fwrite(key, sizeof(char), key_len, stdout);
+      }
+      break;
+    case 'l':
+      fprintf(stdout, "%d", key_len);
+      break;
+    case 'n':
+      fprintf(stdout, "%d", key_n);
+      break;
+    case 'c':
+      fprintf(stdout, "%d", subtotal);
+      break;
+    case 'p':
+      fprintf(stdout, "%d", percent);
+      break;
+    case '%':
+      fputc('%', stdout);
+      break;
+    default:
+      fputc('%', stdout);
+      fputc(*format_p, stdout);
+      break;
+    }
+  }
+  
+  fputc('\n', stdout);
+}
 
 /* 
  * static int count_compare
@@ -326,7 +405,7 @@ int	main(int argc, char **argv)
       
       /* add it into the table */
       ret = table_insert(tab, key_p, key_size, &sortu, sizeof(sortu),
-			 (void **)&sortu_p, 0);
+			 (void *)&sortu_p, 0);
       if (ret == TABLE_ERROR_NONE) {
 	sortu.so_order++;
       }
@@ -401,7 +480,7 @@ int	main(int argc, char **argv)
   for (entries_p = entries; entries_p < entries + entry_n; entries_p++) {
     /* get each entry to print */
     ret = table_entry(tab, *entries_p, (void **)&key_p, &key_size,
-		      (void **)&sortu_p, NULL);
+		      (void *)&sortu_p, NULL);
     if (ret != TABLE_ERROR_NONE) {
       (void)fprintf(stderr, "%s: could not get table entry: %s\n",
 		    argv_program, table_strerror(ret));
@@ -421,7 +500,7 @@ int	main(int argc, char **argv)
   for (entries_p = entries; entries_p < entries + entry_n; entries_p++) {
     /* get each entry to print */
     ret = table_entry(tab, *entries_p, (void **)&key_p, &key_size,
-		      (void **)&sortu_p, NULL);
+		      (void *)&sortu_p, NULL);
     if (ret != TABLE_ERROR_NONE) {
       (void)fprintf(stderr, "%s: could not get table entry: %s\n",
 		    argv_program, table_strerror(ret));
@@ -436,6 +515,18 @@ int	main(int argc, char **argv)
     
     subtotal += sortu_p->so_count;
     
+    if (total > 1000000) {
+      perc = sortu_p->so_count / (total / 100);
+    }
+    else {
+      perc = sortu_p->so_count * 100 / total;
+    }
+    
+    if (format_string != NULL) {
+      print_format(key_p, key_size, sortu_p->so_count, subtotal, perc);
+      continue;
+    }
+    
     if (! no_counts_b) {
       (void)printf("%10lu ", sortu_p->so_count);
       
@@ -445,12 +536,6 @@ int	main(int argc, char **argv)
     }
     
     if (show_percentage_b) {
-      if (total > 1000000) {
-	perc = sortu_p->so_count / (total / 100);
-      }
-      else {
-	perc = sortu_p->so_count * 100 / total;
-      }
       (void)printf("%4ld%% ", perc);
       
       if (cumulative_b) {
