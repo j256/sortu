@@ -1,3 +1,12 @@
+2004-02-05  Gray Watson  <gray@outside.256.com>
+
+	* Added -o --order-sort to keep the keys in order that they were
+	found.
+
+	* Added start and stop offsets for chosing the key.
+
+	* Added automatic tests.
+
 2003-04-23  Gray Watson  <gray@outside.256.com>
 
 	* Fixed a space problem.
