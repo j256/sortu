@@ -2,13 +2,13 @@
 # $Id$
 #
 
-CC	= gcc
+CC	= cc
 
 PROG	= sortu
 OBJS	= sortu.o argv.o compat.o strsep.o table.o
 
-CFLAGS	= -g -Wall $(CCFLS)
-DESTDIR	= /usr/local/local/sbin
+CFLAGS	= -g -Wall -O2 $(CCFLS)
+DESTDIR	= /usr/local/sbin
 
 all : $(PROG)
 

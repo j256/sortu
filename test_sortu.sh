@@ -8,13 +8,19 @@ OUTPUT=sortu_out.t
 rm -f $TEST1 $TEST2 $EXPECTED $OUTPUT
 
 check () {
-    if [ $? -ne 0 ]; then
+    if [ $ERROR -ne 0 ]; then
 	exit 1
     fi
     
     diff -q --ignore-all-space $OUTPUT $EXPECTED
     if [ $? -ne 0 ]; then
 	echo "ERROR: output from test not expected: $NAME"
+	echo "-----------------------------"
+	echo "Output:"
+	cat $OUTPUT
+	echo "-----------------------------"
+	echo "Expected:"
+	cat $EXPECTED
 	exit 2
     fi
     return 0
@@ -41,6 +47,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -62,6 +69,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -83,6 +91,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -105,6 +114,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -126,6 +136,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -145,6 +156,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ###############################################################################
@@ -170,6 +182,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -b $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -191,6 +204,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -c $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -212,6 +226,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -C $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -233,9 +248,35 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -d=, -f 2  $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
+
+NAME="format argument"
+
+cat > $TEST1 <<EOF
+4
+1
+33
+33
+33
+222
+222
+EOF
+
+cat > $EXPECTED <<EOF
+1,1,1
+4,1,1
+222,3,2
+33,2,3
+EOF
+
+./sortu -F '%k,%l,%n' $TEST1 > $OUTPUT
+ERROR=$?
+check
+
+###############################################################################
 
 NAME="key sort argument"
 
@@ -254,28 +295,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -d=, -f 2  $TEST1 > $OUTPUT
-check
-
-########################################
-
-NAME="key sort argument"
-
-cat > $TEST1 <<EOF
-1
-2
-1
-3
-1
-2
-EOF
-
-cat > $EXPECTED <<EOF
-3 1
-2 2
-1 3
-EOF
-
-./sortu -r $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -295,6 +315,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -f 2 -l $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -313,6 +334,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -m 2 $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -332,6 +354,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -M 1 $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -353,6 +376,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -i $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -372,6 +396,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -n $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -391,6 +416,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -N $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -410,6 +436,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -o $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -430,6 +457,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -p $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -437,20 +465,22 @@ check
 NAME="reverse sort argument"
 
 cat > $TEST1 <<EOF
-4
+1
+2
 1
 3
+1
 2
 EOF
 
 cat > $EXPECTED <<EOF
-1 4
+3 1
+2 2
 1 3
-1 2
-1 1
 EOF
 
 ./sortu -r $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -472,6 +502,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -s 1 $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -491,6 +522,7 @@ cat > $EXPECTED <<EOF
 EOF
 
 ./sortu -S 0 $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ########################################
@@ -516,30 +548,7 @@ Count: Data:
 EOF
 
 ./sortu -v $TEST1 > $OUTPUT
-check
-
-###############################################################################
-
-NAME="format argument"
-
-cat > $TEST1 <<EOF
-4
-1
-33
-33
-33
-222
-222
-EOF
-
-cat > $EXPECTED <<EOF
-1,1,1
-4,1,1
-222,3,2
-33,2,3
-EOF
-
-./sortu -F '%k,%l,%n' $TEST1 > $OUTPUT
+ERROR=$?
 check
 
 ###############################################################################
