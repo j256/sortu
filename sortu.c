@@ -103,7 +103,7 @@ static	int	count_compare(const void *key1_p, const int key1_size,
 			      const void *key2_p, const int key2_size,
 			      const void *data2_p, const int data2_size)
 {
-  const double	*float1_p, *float2_p;
+  const double	*double1_p, *double2_p;
   const long	*long1_p, *long2_p;
   const char	*str1_p, *str2_p;
   int		result;
@@ -137,13 +137,13 @@ static	int	count_compare(const void *key1_p, const int key1_size,
   }
   else if (float_numbers_b) {
     /* reverse numeric sort */
-    float1_p = key1_p;
-    float2_p = key2_p;
+    double1_p = key1_p;
+    double2_p = key2_p;
     if (reverse_sort_b) {
-      return *float2_p - *float1_p;
+      return *double2_p - *double1_p;
     }
     else {
-      return *float1_p - *float2_p;
+      return *double1_p - *double2_p;
     }
   }
   else {
@@ -166,7 +166,7 @@ int	main(int argc, char **argv)
   int		file_c, ret, field_c, key_size, entry_n;
   unsigned long	count, *count_p;
   long		value;
-  double	float_value;
+  double	double_value;
   void		*key_p;
   table_t	*tab;
   table_entry_t	**entries, **entries_p;
@@ -257,9 +257,9 @@ int	main(int argc, char **argv)
 	key_size = sizeof(value);
       }
       else if (float_numbers_b) {
-	float_value = atof(tok);
-	key_p = &float_value;
-	key_size = sizeof(float_value);
+	double_value = atof(tok);
+	key_p = &double_value;
+	key_size = sizeof(double_value);
       }
       else {
 	if (case_insens_b) {
@@ -345,7 +345,7 @@ int	main(int argc, char **argv)
       (void)printf("%10ld\n", *(long *)key_p);
     }
     else if (float_numbers_b) {
-      (void)printf("%.2lf\n", *(double *)key_p);
+      (void)printf("%10.2f\n", *(double *)key_p);
     }
     else {
       (void)printf("%.*s\n", key_size, (char *)key_p);
