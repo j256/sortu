@@ -298,7 +298,7 @@ int	main(int argc, char **argv)
   }
   
   if (verbose_b && (! no_counts_b)) {
-    if (numbers_b) {
+    if (numbers_b || float_numbers_b) {
       (void)printf("%10.10s %10.10s\n", "Count:", "Data:");
       (void)printf("---------- ----------\n");
     }
@@ -343,6 +343,9 @@ int	main(int argc, char **argv)
     
     if (numbers_b) {
       (void)printf("%10ld\n", *(long *)key_p);
+    }
+    else if (float_numbers_b) {
+      (void)printf("%.2lf\n", *(double *)key_p);
     }
     else {
       (void)printf("%.*s\n", key_size, (char *)key_p);
