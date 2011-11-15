@@ -1,7 +1,22 @@
 /*
  * Sort/uniq program
  *
- * Copyright 1999 by Gray Watson
+ * Copyright 2008 by Gray Watson
+ *
+ * This file is part of the sortu package.
+ *
+ * Permission to use, copy, modify, and distribute this software for
+ * any purpose and without fee is hereby granted, provided that the
+ * above copyright notice and this permission notice appear in all
+ * copies, and that the name of Gray Watson not be used in advertising
+ * or publicity pertaining to distribution of the document or software
+ * without specific, written prior permission.
+ *
+ * Gray Watson makes no representations about the suitability of the
+ * software described herein for any purpose.  It is provided "as is"
+ * without express or implied warranty.
+ *
+ * The author may be contacted via http://256.com/gray/
  *
  * $Id$
  */
@@ -15,6 +30,7 @@
 #include "table.h"
 
 #define DEFAULT_DELIM	" "
+#define VERSION_STRING	"2.1.2"
 #define LINE_SIZE	1024
 
 /* struct for the order/count stuff */
@@ -31,6 +47,7 @@ static	char		*delim_str = DEFAULT_DELIM; /* field delim char */
 static	int		field = -1;		/* field to use */
 static	char		*format_string = 0L;	/* format argument */
 static	int		case_insens_b = 0;	/* case insensitive matches */
+static	int		help_b = 0;		/* help message */
 static	int		key_sort_b = 0;		/* sort by key not count */
 static	int		loose_fields_b = 0;	/* loose field match */
 static	int		min_matches = 0;	/* minimum number of matches */
@@ -59,6 +76,8 @@ static	argv_t	args[] = {
     "number",		"which field to use otherwise 1st" },
   { 'F',	"format",	ARGV_CHAR_P,		&format_string,
     "format",		"output format: %k %n %l %p %c" },
+  { 'h',	"help",		ARGV_BOOL_INT,		&help_b,
+    NULL,		"help message" },
   { 'k',	"key-sort",	ARGV_BOOL_INT,		&key_sort_b,
     NULL,		"sort by key not count" },
   { 'l',	"loose-fields",	ARGV_BOOL_INT,		&loose_fields_b,
@@ -292,7 +311,16 @@ int	main(int argc, char **argv)
   sortu_t	sortu, *sortu_p;
   table_entry_t	**entries, **entries_p;
   
+  argv_version_string = VERSION_STRING;
   argv_process(args, argc, argv);
+  
+  if (help_b) {
+    (void)printf("Sortu Utility: http://256.com/sources/sortu/\n");
+    (void)printf("  This utility is a replacement for the sort and uniq programs.\n");
+    (void)printf("  For a list of the command-line options enter: %s --usage\n",
+                 argv_argv[0]);
+    exit(0);
+  }
   
   /* if we aren't showing the counts, we might as well sort by the key */
   if (no_counts_b) {

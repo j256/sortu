@@ -1,9 +1,9 @@
 /*
  * compatibility functions for those systems who are missing them.
  *
- * Copyright 1995 by Gray Watson
+ * Copyright 2008 by Gray Watson
  *
- * This file is part of the argv library.
+ * This file is part of the sortu package.
  *
  * Permission to use, copy, modify, and distribute this software for
  * any purpose and without fee is hereby granted, provided that the
@@ -15,6 +15,8 @@
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
+ *
+ * The author may be contacted via http://256.com/gray/
  *
  * The author may be reached via http://256.com/gray/
  */
