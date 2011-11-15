@@ -269,9 +269,8 @@ static	table_entry_t	*this_entry(const table_t *table_p,
  * example, if you need only 10 bits, do h = (h & hashmask(10)); In
  * which case, the hash table should have hashsize(10) elements.
  *
- * By Bob Jenkins, 1996.  bob_jenkins@compuserve.com.  You may use
- * this code any way you wish, private, educational, or commercial.
- * It's free.  See
+ * By Bob Jenkins, 1996.   You may use this code any way you wish, private,
+ * educational, or commercial.  It's free.  See
  * http://ourworld.compuserve.com/homepages/bob_jenkins/evahash.htm
  * Use for hash table lookup, or anything where one collision in 2^^32
  * is acceptable.  Do NOT use for cryptographic purposes.

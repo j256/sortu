@@ -1,8 +1,8 @@
-2004-07-16  Gray Watson  <gray@outside.256.com>
+2004-07-16  Gray Watson
 
 	* Added -F --format format string to the output.
 
-2004-02-05  Gray Watson  <gray@outside.256.com>
+2004-02-05  Gray Watson
 
 	* Added -o --order-sort to keep the keys in order that they were
 	found.
@@ -11,15 +11,15 @@
 
 	* Added automatic tests.
 
-2003-04-23  Gray Watson  <gray@outside.256.com>
+2003-04-23  Gray Watson
 
 	* Fixed a space problem.
 
-2002-02-04  Gray Watson  <gray@outside.256.com>
+2002-02-04  Gray Watson
 
 	* Added percentage and total and fixed some output.
 
-Mon Oct  2 19:21:21 2000  Gray Watson  <gray@whopper.be.256.com>
+Mon Oct  2 19:21:21 2000  Gray Watson
 
 	* Swapped the default order of the count.  Use -r to get the old
  	default.
@@ -28,11 +28,11 @@ Mon Oct  2 19:21:21 2000  Gray Watson  <gray@whopper.be.256.com>
 
 	* Added -l loose-fields switch to better handle wierd column output.
 
-Tue Aug  8 11:40:23 2000  Gray Watson  <gray@256.com>
+Tue Aug  8 11:40:23 2000  Gray Watson
 
 	* Added case insensitive flag.  -i.
 
-Mon Jul 10 15:56:10 2000  Gray Watson  <gray@256.com>
+Mon Jul 10 15:56:10 2000  Gray Watson
 
 	* Added ignore-blanks (-b) flag.
 
@@ -40,10 +40,10 @@ Mon Jul 10 15:56:10 2000  Gray Watson  <gray@256.com>
 
 	* If -C then sort by key (-k) also enabled.
 
-Thu Jun 22 17:45:30 2000  Gray Watson  <gray@256.com>
+Thu Jun 22 17:45:30 2000  Gray Watson
 
 	* Fixed the -C --no-counts flag.
 
-Mon Jun 12 16:40:13 2000  Gray Watson  <gray@256.com>
+Mon Jun 12 16:40:13 2000  Gray Watson
 
 	* Added -m (min-matches) and -M (max-matches) functionality.

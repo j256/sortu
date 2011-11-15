@@ -49,11 +49,10 @@
 #include "dmalloc.h"
 #endif
 
-#include "conf.h"
+#include "strsep.h"
 
 #include "argv.h"
 #include "argv_loc.h"
-#include "compat.h"
 
 #if INCLUDE_RCS_IDS
 static	char	*rcs_id =
@@ -2303,8 +2302,7 @@ static	void	do_arg(argv_t *grid, argv_t *match_p, const char *close_p,
  * Examine an argument string to see if it really is a negative number
  * being passed into a previously specified argument.
  *
- * Thanks much to Nick Kisseberth <nkissebe@hera.itg.uiuc.edu> for
- * pointing out this oversight.
+ * Thanks much to Nick Kisseberth for pointing out this oversight.
  *
  * RETURNS:
  *
@@ -2638,8 +2636,7 @@ static	void	do_list(argv_t *grid, const int arg_c, char **argv,
 	   * allow values with negative signs if we are at the start
 	   * of an argument list, and if the argument is a number, and
 	   * we already have a variable looking for a value.  Thanks
-	   * to Nick Kisseberth <nkissebe@hera.itg.uiuc.edu> for
-	   * pointing out this oversight.
+	   * to Nick Kisseberth for pointing out this oversight.
 	   */
 	  if (char_c == 0 && is_number(*arg_p)
 	      && *queue_head_p > *queue_tail_p) {
