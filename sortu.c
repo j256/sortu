@@ -15,10 +15,6 @@
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
- *
- * The author may be contacted via http://256.com/gray/
- *
- * $Id$
  */
 
 #include <ctype.h>

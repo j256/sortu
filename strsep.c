@@ -15,14 +15,7 @@
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
- *
- * The author may be contacted via http://256.com/gray/
- *
- * The author may be reached via http://256.com/gray/
  */
-
-static	char	*rcs_id =
-"$Id$";
 
 /*
  * char *strsep

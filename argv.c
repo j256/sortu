@@ -15,10 +15,6 @@
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
- *
- * The author may be contacted via http://256.com/gray/
- *
- * $Id$
  */
 
 #if defined(WIN32)
@@ -53,11 +49,6 @@
 
 #include "argv.h"
 #include "argv_loc.h"
-
-#if INCLUDE_RCS_IDS
-static	char	*rcs_id =
-  "$Id$";
-#endif
 
 /* internal routines */
 static	void	do_list(argv_t *grid, const int arg_c, char **argv,

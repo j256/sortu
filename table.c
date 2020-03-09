@@ -15,10 +15,6 @@
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
- *
- * The author may be contacted via http://256.com/gray/
- *
- * $Id$
  */
 
 /*
@@ -53,15 +49,6 @@
 #ifdef DMALLOC
 #include "dmalloc.h"
 #endif
-
-static	char	*rcs_id =
-  "$Id$";
-
-/*
- * Version id for the library.  You also need to add an entry to the
- * NEWS and ChangeLog files.
- */
-static char *version_id = "$TableVersion: 4.2.0 October-25-1998 $";
 
 /****************************** local functions ******************************/
 
@@ -1878,7 +1865,6 @@ int	table_retrieve(table_t *table_p,
   for (entry_p = buckets[bucket];
        entry_p != NULL;
        entry_p = entry_p->te_next_p) {
-    entry_p = entry_p;
     if (entry_p->te_key_size == ksize
 	&& memcmp(ENTRY_KEY_BUF(entry_p), key_buf, ksize) == 0) {
       break;

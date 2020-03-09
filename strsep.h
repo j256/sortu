@@ -17,8 +17,6 @@
  * without express or implied warranty.
  *
  * The author may be contacted via http://256.com/gray/
- *
- * $Id$
  */
 
 #ifndef __STRSEP_H__

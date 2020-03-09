@@ -15,10 +15,6 @@
  * Gray Watson makes no representations about the suitability of the
  * software described herein for any purpose.  It is provided "as is"
  * without express or implied warranty.
- *
- * The author may be contacted via http://256.com/gray/
- *
- * $Id$
  */
 
 #ifndef __ARGV_H__
@@ -37,8 +33,6 @@
 /* produced by configure, inserted into argv.h */
 /* used to handle the const operator */
 /* const is available */
-
-/* NOTE: start of $Id$ */
 
 /*
  * Generic and standardized argument processor.  You describe the arguments

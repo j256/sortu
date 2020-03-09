@@ -1,14 +1,7 @@
-#
-# $Id$
-#
-
 CC	= cc
 
 PROG	= sortu
 OBJS	= sortu.o argv.o strsep.o table.o
-
-PORTFLS	= README.txt LICENSE.txt Makefile ChangeLog test_sortu.sh \
-	sortu.c strsep.[ch] argv.[ch] argv_loc.h table.[ch] table_loc.h
 
 CFLAGS	= -g -Wall -O2 $(CCFLS)
 DESTDIR	= /usr/local/sbin
@@ -31,11 +24,7 @@ $(PROG) : $(OBJS)
 	rm -f $@
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o $@
 
-port :: port.t
-
-port.t :: $(PORTFLS)
-	rm -rf $@
-	mkdir $@
-	cp $(PORTFLS) $@
-	@ echo ''
-	@ echo 'Please rename $@ to a version and tar up file'
+argv.o: argv.c strsep.h argv.h argv_loc.h
+sortu.o: sortu.c argv.h table.h
+strsep.o: strsep.c
+table.o: table.c table.h table_loc.h
