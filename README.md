@@ -14,55 +14,54 @@ sorting on.
 
 To list all of the available options, use 'sortu --usage'.
 
--b (--blank-ignore)
+* -b (--blank-ignore)
 	Ignore blank lines.
--c (--cumulative-numbers)
+* -c (--cumulative-numbers)
 	Show cumulative counts in the output.
--C (--no-counts)
+* -C (--no-counts)
 	Don't output string counts.  Just show the unique lines.
--d chars (--delimiter)
+* -d chars (--delimiter)
 	Use with -f to specify a specific field you want to cut out of
 	each line.  Default is a space (" ").
--f number (--field)
+* -f number (--field)
 	Use with -d to specify a field you want to cut out of each line.  So if you have a file with
         name,rank,serial-number then you can specify -f 2 with a -d , to cut out the 2nd field
 	separated by comma (,) which will show you the unique ranks out of the file.
--F format (--format)
+* -F format (--format)
 	Specify an output format.  You can use the following special strings
 	which are replaced in the output.
-
-	%k key or line
-	%n number of times the key appeared in the file
-	%l length of the key
-	%p percentage of the total lines
-	%c cumulative count
--k (--key-sort)
+	* `%k` key or line
+	* `%n` number of times the key appeared in the file
+	* `%l` length of the key
+	* `%p` percentage of the total lines
+	* `%c` cumulative count
+* -k (--key-sort)
 	Sort by key or line, not the count.
--l (--loose-fields)
+* -l (--loose-fields)
 	Ignores white space between fields.  Use with -d to get the 2nd	non-blank field.
--m number (--minimum-matches)
+* -m number (--minimum-matches)
 	Minimum number of matches to show.
--M number (--maximum-matches)
+* -M number (--maximum-matches)
 	Maximum number of matches to show.
--i (--insensitive-case)
+* -i (--insensitive-case)
 	Perform case insensitive matches.
--n (--numbers)
+* -n (--numbers)
 	Treat the line or field as a signed long number.
--N (--float-numbers)
+* -N (--float-numbers)
 	Treat the line or field as a floating point number.
--o (--order-sort)
+* -o (--order-sort)
 	Output in order of discovery, not in sorted order.
--p (--percentage-show)
+* -p (--percentage-show)
 	Show percentage along with counts.
--r (--reverse-sort)
+* -r (--reverse-sort)
 	Reverse the sort order.
--s offset (--start-offset)
+* -s offset (--start-offset)
 	Start the key/line at this offset (0 is first).
--S offset (--stop-offset)
+* -S offset (--stop-offset)
 	Stop the key/line at this offset (0 is first).
--v (--verbose)
+* -v (--verbose)
 	Verbose messages.
-file(s)
+* file(s)
 	File(s) to process otherwise use standard-in.
 
 ## Repository
