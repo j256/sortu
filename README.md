@@ -16,7 +16,7 @@ To list all of the available options, use 'sortu --usage'.
 
 | Short | Long | Argument | Description |
 | ----- | ---- | -------- | ----------- |
-| `-b` | <nobr>`--blank-ignore`</nobr>< | | Ignore blank lines. |
+| `&#x2011;b` | `&#x2011;&#x2011;blank&#x2011;ignore` | | Ignore blank lines. |
 | -c | --cumulative-numbers | | Show cumulative counts in the output. |
 | -C |--no-counts | | Don't output string counts.  Just show the unique lines. |
 | -d | --delimiter | chars | Use with -f to specify a specific field you want to cut out of each line.  Default is a space (" "). |
