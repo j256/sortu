@@ -19,11 +19,9 @@ To list all of the available options, use 'sortu --usage'.
 | -b | --blank-ignore | | Ignore blank lines. |
 | -c | --cumulative-numbers | | Show cumulative counts in the output. |
 | -C |--no-counts | | Don't output string counts.  Just show the unique lines. |
-| -d | --delimiter | chars | Use with -f to specify a specific field you want to cut out of
-each line.  Default is a space (" "). |
+| -d | --delimiter | chars | Use with -f to specify a specific field you want to cut out of each line.  Default is a space (" "). |
 | -f | --field | number | Use with -d to specify a field you want to cut out of each line.  So if you have a file with name,rank,serial-number then you can specify -f 2 with a -d , to cut out the 2nd field separated by comma (,) which will show you the unique ranks out of the file. |
-| -F | --format | format | Specify an output format.  You can use the following special strings
-which are replaced in the output.  `%k` key or line.  `%n` number of times the key appeared in the file. `%l` length of the key. `%p` percentage of the total lines. `%c` cumulative count |
+| -F | --format | format | Specify an output format.  You can use the following special strings which are replaced in the output.  `%k` key or line.  `%n` number of times the key appeared in the file. `%l` length of the key. `%p` percentage of the total lines. `%c` cumulative count |
 | -k | --key-sort | | Sort by key or line, not the count. |
 | -l | --loose-fields | | Ignores white space between fields.  Use with -d to get the 2nd non-blank field. |
 | -m | --minimum-matches | number | Minimum number of matches to show. |
