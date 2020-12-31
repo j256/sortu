@@ -16,7 +16,6 @@ To list all of the available options, use 'sortu --usage'.
 
 | Short | Long | Argument | Description |
 | ----- | ---- | -------- | ----------- |
-
 | -b | --blank-ignore | | Ignore blank lines. |
 | -c | --cumulative-numbers | | Show cumulative counts in the output. |
 | -C |--no-counts | | Don't output string counts.  Just show the unique lines. |
@@ -32,7 +31,6 @@ which are replaced in the output.
 * `%l` length of the key
 * `%p` percentage of the total lines
 * `%c` cumulative count |
-
 | -k | --key-sort | | Sort by key or line, not the count. |
 | -l | --loose-fields | | Ignores white space between fields.  Use with -d to get the 2nd non-blank field. |
 | -m | --minimum-matches | number | Minimum number of matches to show. |
