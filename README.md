@@ -41,4 +41,4 @@ To list all of the available options, use 'sortu --usage'.
 
 The newest versions of the program are available via:  https://github.com/j256/sortu
 
-Enjoy, Gray Watson
+Enjoy.  Gray Watson
